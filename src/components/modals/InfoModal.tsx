@@ -12,7 +12,7 @@ export const InfoModal = ({ isOpen, handleClose }: Props) => {
       <p className="text-sm text-gray-500 dark:text-gray-300">
         A {" "}
         <a
-          href="heardle.app"
+          href="https://10s.heardledecades.com/"
           target="_blank"
           className="underline font-bold"
           rel="noreferrer"

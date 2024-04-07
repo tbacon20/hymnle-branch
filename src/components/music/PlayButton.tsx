@@ -8,7 +8,7 @@ type Props = {
 export const PlayButton = ({ isPlaying, setIsPlaying }: Props) => {
   if (!isPlaying) {
     return (
-      <div className="flex justify-center mb-5">
+      <div className="flex justify-center">
         <PlayIcon
           className="w-14 h-14 cursor-pointer dark:stroke-white"
           onClick={() => setIsPlaying(true)}
@@ -17,7 +17,7 @@ export const PlayButton = ({ isPlaying, setIsPlaying }: Props) => {
     );
   }
   return (
-    <div className="flex justify-center mb-5">
+    <div className="flex justify-center">
       <PauseIcon
         className="w-14 h-14 cursor-pointer dark:stroke-white"
         onClick={() => setIsPlaying(false)}

@@ -2,6 +2,26 @@
 
 This is a clone project of the popular word guessing game we all know and love. Made using React, Typescript, and Tailwind.
 
+## Project Tracker
+
+- Song List
+  - Import song files
+  - Logic for picking song of the day
+  - Remove old Wordle logic
+- Search Bar
+  - Logic for selecting a song and submit it as a guess.
+- Submit logic
+  - Logic for checking song guess and verifying it's correct.
+  - If not correct, handle moving on to next guess.
+- Guesses Grid
+  - Handle game logic
+- Song Player
+  - Logic for playing a song 1s, 2s, 4s, 8s, 16s, 32s.
+  - Skip button logic
+- ~~Update Information Modal~~
+- Update Settings
+- Update Stats
+
 ## Build and run
 
 ### Prerequisites for Windows OS:

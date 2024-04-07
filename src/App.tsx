@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Grid } from "./components/grid/Grid";
-import { Keyboard } from "./components/keyboard/Keyboard";
 import { InfoModal } from "./components/modals/InfoModal";
 import { StatsModal } from "./components/modals/StatsModal";
 import { SettingsModal } from "./components/modals/SettingsModal";
+import { autocomplete } from "./lib/searchbar";
+import { hymnTitles } from "./lib/searchbar";
 
 import {
   WIN_MESSAGES,
@@ -44,6 +44,7 @@ import { PlayButton } from "./components/music/PlayButton";
 import { SearchBar } from "./components/music/SearchBar";
 import { SubmitButton } from "./components/music/SubmitButton";
 import { SkipButton } from "./components/music/SkipButton";
+import { GameRows } from "./components/grid/GameRows";
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -96,6 +97,10 @@ function App() {
       ? localStorage.getItem("gameMode") === "hard"
       : false
   );
+
+  useEffect(()=> {  autocomplete(document.getElementById("searchBarInput"), hymnTitles);
+}
+);
 
   useEffect(() => {
     // if no game state on load,
@@ -254,14 +259,15 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
-        <div className="pb-2 grow">
-          <Grid
+        {/* <div className="pb-2 grow">
+           <Grid
             guesses={guesses}
             currentGuess={currentGuess}
             isRevealing={isRevealing}
             currentRowClassName={currentRowClass}
-          />
-        </div>
+          /> 
+        </div> */}
+        <GameRows></GameRows>
         <PlayButton setIsPlaying={setIsPlaying} isPlaying={isPlaying} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar></SearchBar>

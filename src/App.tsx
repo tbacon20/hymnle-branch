@@ -259,16 +259,8 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
-        {/* <div className="pb-2 grow">
-           <Grid
-            guesses={guesses}
-            currentGuess={currentGuess}
-            isRevealing={isRevealing}
-            currentRowClassName={currentRowClass}
-          /> 
-        </div> */}
         <GameRows></GameRows>
-        <PlayButton setIsPlaying={setIsPlaying} isPlaying={isPlaying} />
+        <PlayButton audioUrl="https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3" playDuration={10} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar></SearchBar>
           <div className="flex justify-between">
@@ -276,14 +268,6 @@ function App() {
             <SubmitButton></SubmitButton>
           </div>
         </div>
-{/* 
-        <Keyboard
-          onChar={onChar}
-          onDelete={onDelete}
-          onEnter={onEnter}
-          guesses={guesses}
-          isRevealing={isRevealing}
-        /> */}
         <InfoModal
           isOpen={isInfoModalOpen}
           handleClose={() => setIsInfoModalOpen(false)}

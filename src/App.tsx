@@ -45,6 +45,7 @@ import { SearchBar } from "./components/music/SearchBar";
 import { SubmitButton } from "./components/music/SubmitButton";
 import { SkipButton } from "./components/music/SkipButton";
 import { GameRows } from "./components/grid/GameRows";
+import { HYMNS } from "./constants/hymn";
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -98,9 +99,7 @@ function App() {
       : false
   );
 
-  useEffect(()=> {  autocomplete(document.getElementById("searchBarInput"), hymnTitles);
-}
-);
+  // moved to searchbar.tsx useEffect(()=> {  autocomplete(document.getElementById("searchBarInput"), hymnTitles);});
 
   useEffect(() => {
     // if no game state on load,
@@ -188,7 +187,28 @@ function App() {
     );
   };
 
+  const onSelect = (selectedHymn: string) => {
+    //console.log("Selected hymn in app:",selectedHymn);
+    setCurrentGuess(selectedHymn);
+  };
+
   const onEnter = () => {
+    if (currentGuess) {
+      const hymn = HYMNS.find(h => h.title === currentGuess);
+
+      if (hymn) {
+        // TODO add checks that game is not over/not too many guesses etc
+        //console.log('You selected:',currentGuess);
+        setGuesses((prevGuesses) => [...prevGuesses, currentGuess]); // Update guesses array with valid hymn title
+      } else {
+        alert("Hymn title not found.");
+      } // TODO update to use localStorage. This is a Temp method for setting guess to guesses array
+    } else {
+      alert("No hymn selected.");
+    }
+    setCurrentGuess("");
+    // TODO modify this to work with the hymnle app
+    /*
     if (isGameWon || isGameLost) {
       return;
     }
@@ -249,6 +269,7 @@ function App() {
         });
       }
     }
+    */
   };
 
   return (
@@ -259,13 +280,13 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
-        <GameRows></GameRows>
+      <GameRows guesses={guesses}></GameRows>
         <PlayButton audioUrl="https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3" playDuration={10} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
-          <SearchBar></SearchBar>
+          <SearchBar onSelect={onSelect}></SearchBar>
           <div className="flex justify-between">
             <SkipButton></SkipButton>
-            <SubmitButton></SubmitButton>
+            <SubmitButton onClick={onEnter}></SubmitButton>
           </div>
         </div>
         <InfoModal

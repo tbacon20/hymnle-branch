@@ -22,7 +22,7 @@ export const GameRows = ({guesses}: GameRowsProps) => {
         .filter((id) => id !== null) as number[];
 
       setGuessIds(updatedGuessIds);
-      alert("Current guess IDs: " + updatedGuessIds.join(", "));
+      //console.log("Current guess IDs: " + updatedGuessIds.join(", "));
     }
   }, [guesses]);
   
@@ -36,7 +36,8 @@ export const GameRows = ({guesses}: GameRowsProps) => {
       ))}
       
       {/* Render CorrectRow if there's a correct guess, placeholder for now 
-      <CorrectRow hymn={HYMNS[1]} />*/}
+      <CorrectRow hymn={HYMNS[1]} />
+      */}
 
       {/* Render EmptyRows for remaining spaces */}
       {6 - guessIds.length > 0 && 

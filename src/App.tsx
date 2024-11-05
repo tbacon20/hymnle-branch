@@ -272,6 +272,9 @@ function App() {
     */
   };
 
+  //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"
+  const audioUrl = HYMNS[1]?.mp3_url;
+
   return (
     <div className="h-screen flex flex-col">
       <Navbar
@@ -281,7 +284,7 @@ function App() {
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
       <GameRows guesses={guesses}></GameRows>
-        <PlayButton audioUrl="https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3" playDuration={10} />
+        <PlayButton audioUrl={audioUrl} playDuration={10} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect}></SearchBar>
           <div className="flex justify-between">

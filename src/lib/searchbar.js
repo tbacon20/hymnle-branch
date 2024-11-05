@@ -1,28 +1,24 @@
 import { HYMNS } from '../constants/hymn';
 
-/* eslint-disable eqeqeq */
-export function autocomplete(inp, arr) {
+export function autocomplete(inp, arr, onSelect) {
     let currentFocus;
-    
+
     inp.addEventListener("input", function(e) {
         let a, b, val = this.value;
         closeAllLists();
         if (!val) { return false; }
         currentFocus = -1;
-        
-        /* Create a DIV to contain the items (values), positioning it above the input field */
+
         a = document.createElement("DIV");
         a.setAttribute("id", this.id + "autocomplete-list");
         a.setAttribute("class", "autocomplete-items");
-        
-        /* Adjust the styling to display above the input */
+
         a.style.position = "absolute";
         a.style.bottom = "100%";
         a.style.width = "100%";
-        
+
         this.parentNode.appendChild(a);
 
-        /* Show up to 6 matching items */
         let matchCount = 0;
         for (let i = 0; i < arr.length && matchCount < 6; i++) {
             if (arr[i].substr(0, val.length).toUpperCase() === val.toUpperCase()) {
@@ -30,10 +26,15 @@ export function autocomplete(inp, arr) {
                 b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
                 b.innerHTML += arr[i].substr(val.length);
                 b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                
+
                 b.addEventListener("click", function(e) {
-                    inp.value = this.getElementsByTagName("input")[0].value;
+                    const selectedHymn = this.getElementsByTagName("input")[0].value;
+
+                    inp.value = selectedHymn;
                     closeAllLists();
+
+                    //console.log("hymn from searchbar:",selectedHymn);
+                    onSelect(selectedHymn);
                 });
 
                 a.appendChild(b);

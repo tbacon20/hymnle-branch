@@ -55,6 +55,7 @@ function App() {
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert();
   const [currentGuess, setCurrentGuess] = useState("");
+  const [currentTurn, setCurrentTurn] = useState(1);
   const [isGameWon, setIsGameWon] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
@@ -148,6 +149,12 @@ function App() {
     setCurrentRowClass("");
   };
 
+  const getPlayDuration = (turn: number) => {
+    const baseDuration = 2; 
+    const increment = 2;
+    return baseDuration + (turn - 1) * increment;
+  };
+
   useEffect(() => {
     saveGameStateToLocalStorage({ guesses, solution });
   }, [guesses]);
@@ -200,6 +207,7 @@ function App() {
         // TODO add checks that game is not over/not too many guesses etc
         //console.log('You selected:',currentGuess);
         setGuesses((prevGuesses) => [...prevGuesses, currentGuess]); // Update guesses array with valid hymn title
+        setCurrentTurn((prevTurn) => prevTurn + 1); // Go to the next turn
       } else {
         alert("Hymn title not found.");
       } // TODO update to use localStorage. This is a Temp method for setting guess to guesses array
@@ -274,6 +282,7 @@ function App() {
 
   //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"
   const audioUrl = HYMNS[1]?.mp3_url;
+  const playDuration = getPlayDuration(currentTurn);
 
   return (
     <div className="h-screen flex flex-col">
@@ -284,7 +293,7 @@ function App() {
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
       <GameRows guesses={guesses}></GameRows>
-        <PlayButton audioUrl={audioUrl} playDuration={10} />
+        <PlayButton audioUrl={audioUrl} playDuration={playDuration} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect}></SearchBar>
           <div className="flex justify-between">

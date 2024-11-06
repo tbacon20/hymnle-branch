@@ -6,11 +6,12 @@ import { useEffect, useState } from "react";
 
 type GameRowsProps = {
   guesses: string[];
-}; 
+  isGameWon: boolean;
+};
 
-export const GameRows = ({guesses}: GameRowsProps) => {
+export const GameRows = ({ guesses, isGameWon }: GameRowsProps) => {
   const [guessIds, setGuessIds] = useState<number[]>([]);
-  
+
   useEffect(() => {
     if (guesses.length > 0) {
       // Map over the guesses and get only the IDs of valid guesses
@@ -22,25 +23,25 @@ export const GameRows = ({guesses}: GameRowsProps) => {
         .filter((id) => id !== null) as number[];
 
       setGuessIds(updatedGuessIds);
-      //console.log("Current guess IDs: " + updatedGuessIds.join(", "));
     }
   }, [guesses]);
-  
-  const fakeIncorrectHymn = HYMNS[0]
-  const fakeCorrectHymn = HYMNS[1];
+
+  // Render the rows
   return (
     <div className="max-w-screen-sm w-full mx-auto grow">
-      {/* Render IncorrectRow for each valid guess ID */}
-      {guessIds.map((id) => (
-        <IncorrectRow key={id} hymn={HYMNS[id]} />
-      ))}
-      
-      {/* Render CorrectRow if there's a correct guess, placeholder for now 
-      <CorrectRow hymn={HYMNS[1]} />
-      */}
+      {/* Render each guess, check if it's the last guess and if the game is won */}
+      {guessIds.map((id, index) => {
+        if (index === guessIds.length - 1 && isGameWon) {
+          // If it's the last guess and the game is won, render CorrectRow
+          return <CorrectRow key={id} hymn={HYMNS[id]} />;
+        } else {
+          // For all other guesses, render IncorrectRow
+          return <IncorrectRow key={id} hymn={HYMNS[id]} />;
+        }
+      })}
 
       {/* Render EmptyRows for remaining spaces */}
-      {6 - guessIds.length > 0 && 
+      {6 - guessIds.length > 0 &&
         Array.from({ length: 6 - guessIds.length }).map((_, index) => (
           <EmptyRow key={index} />
         ))}

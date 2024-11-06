@@ -74,7 +74,9 @@ function App() {
     getStoredIsHighContrastMode()
   );
   const [isRevealing, setIsRevealing] = useState(false);
-  const [guesses, setGuesses] = useState<string[]>(() => {
+  const [guesses, setGuesses] = useState<string[]>([]);
+  // TODO load from local storage in the future
+  /*(() => {
     const loaded = loadGameStateFromLocalStorage();
     if (loaded?.solution !== solution) {
       return [];
@@ -83,6 +85,7 @@ function App() {
     if (gameWasWon) {
       setIsGameWon(true);
     }
+
     if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
       setIsGameLost(true);
       showErrorAlert(CORRECT_WORD_MESSAGE(solution), {
@@ -91,6 +94,23 @@ function App() {
     }
     return loaded.guesses;
   });
+
+  // Restarting local storage during development for testing
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Clearing localStorage during development...");
+      localStorage.clear();
+    }
+  }, []);
+  */
+
+  useEffect(() => {
+      // Testing for game won functionality in GameRows.tsx
+      if (guesses.length === 3) {
+        setIsGameWon(true);
+      }
+  });
+
 
   const [stats, setStats] = useState(() => loadStats());
 
@@ -201,18 +221,27 @@ function App() {
 
   const onEnter = () => {
     if (currentGuess) {
-      const hymn = HYMNS.find(h => h.title === currentGuess);
+      const hymn = HYMNS.find((h: { title: string; }) => h.title === currentGuess);
 
-      if (hymn) {
+      if (hymn && currentTurn < MAX_CHALLENGES) {
         // TODO add checks that game is not over/not too many guesses etc
+        // TODO update to use localStorage. This is a Temp method for setting guess to guesses array
         //console.log('You selected:',currentGuess);
         setGuesses((prevGuesses) => [...prevGuesses, currentGuess]); // Update guesses array with valid hymn title
         setCurrentTurn((prevTurn) => prevTurn + 1); // Go to the next turn
+      } else if (guesses.length >= MAX_CHALLENGES) {
+        // TODO use the modal instead of alert
+        alert("You have reached the maximum number of guesses.");
       } else {
         alert("Hymn title not found.");
-      } // TODO update to use localStorage. This is a Temp method for setting guess to guesses array
+      } 
     } else {
       alert("No hymn selected.");
+    }
+
+    const searchBar = document.getElementById("searchBarInput") as HTMLInputElement;
+    if (searchBar) {
+      searchBar.value = "";
     }
     setCurrentGuess("");
     // TODO modify this to work with the hymnle app
@@ -292,7 +321,7 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
-      <GameRows guesses={guesses}></GameRows>
+      <GameRows guesses={guesses} isGameWon={isGameWon}></GameRows>
         <PlayButton audioUrl={audioUrl} playDuration={playDuration} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect}></SearchBar>

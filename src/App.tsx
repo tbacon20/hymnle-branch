@@ -310,7 +310,7 @@ function App() {
   };
 
   //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"
-  const audioUrl = HYMNS[1]?.mp3_url;
+  const audioUrl = HYMNS[0]?.mp3_url;
   const playDuration = getPlayDuration(currentTurn);
 
   return (

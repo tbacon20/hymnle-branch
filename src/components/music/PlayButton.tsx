@@ -29,6 +29,21 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
     };
   }, []);
 
+  // Effect to reset the audio when the playDuration changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (isPlaying) {
+      audio.pause(); // Pause the current audio
+      audio.currentTime = 0; // Reset playback position
+      audio.play(); // Start playback again
+      if (timerRef.current) clearTimeout(timerRef.current); // Clear any existing timeout
+      timerRef.current = setTimeout(() => {
+        audio.pause();
+        setIsPlaying(false);
+      }, playDuration * 1000);
+    }
+  }, [playDuration]);
+
   // Toggle play/pause
   const togglePlayPause = () => {
     const audio = audioRef.current;
@@ -36,6 +51,7 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
       audio.pause();
       if (timerRef.current) clearTimeout(timerRef.current); // Clear the timeout when manually paused
     } else {
+      audio.currentTime = 0; // Reset playback position to 0
       audio.play();
       timerRef.current = setTimeout(() => {
         audio.pause();

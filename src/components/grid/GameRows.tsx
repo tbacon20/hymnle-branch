@@ -28,7 +28,7 @@ export const GameRows = ({ guesses, isGameWon }: GameRowsProps) => {
 
   // Render the rows
   return (
-    <div className="max-w-screen-sm w-full mx-auto grow">
+    <div className="max-w-screen-sm w-full mx-auto">
       {/* Render each guess, check if it's the last guess and if the game is won */}
       {guessIds.map((id, index) => {
         if (index === guessIds.length - 1 && isGameWon) {

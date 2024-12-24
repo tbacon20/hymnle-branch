@@ -8,71 +8,102 @@ type Props = {
 
 export const PlayButton = ({ audioUrl, playDuration }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(playDuration); // Track remaining time
   const audioRef = useRef(new Audio(audioUrl));
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Effect for initializing and cleaning up the audio
   useEffect(() => {
     const audio = audioRef.current;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
 
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
 
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
       audio.pause();
-      if (timerRef.current) clearTimeout(timerRef.current); // Clear the timeout if exists
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
-  // Effect to reset the audio when the playDuration changes
   useEffect(() => {
-    const audio = audioRef.current;
     if (isPlaying) {
-      audio.pause(); // Pause the current audio
-      audio.currentTime = 0; // Reset playback position
-      audio.play(); // Start playback again
-      if (timerRef.current) clearTimeout(timerRef.current); // Clear any existing timeout
-      timerRef.current = setTimeout(() => {
-        audio.pause();
-        setIsPlaying(false);
-      }, playDuration * 1000);
+      resetAudioAndTimer();
+    } else {
+      setRemainingTime(playDuration);
     }
   }, [playDuration]);
 
-  // Toggle play/pause
+  useEffect(() => {
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(intervalRef.current!);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+  }, [isPlaying]);
+
+  const resetAudioAndTimer = () => {
+    const audio = audioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    setRemainingTime(playDuration);
+    audio.play();
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      audio.pause();
+      setIsPlaying(false);
+      setRemainingTime(playDuration);
+    }, playDuration * 1000);
+  };
+
   const togglePlayPause = () => {
     const audio = audioRef.current;
     if (isPlaying) {
       audio.pause();
-      if (timerRef.current) clearTimeout(timerRef.current); // Clear the timeout when manually paused
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     } else {
-      audio.currentTime = 0; // Reset playback position to 0
-      audio.play();
-      timerRef.current = setTimeout(() => {
-        audio.pause();
-        setIsPlaying(false);
-      }, playDuration * 1000); // Convert seconds to milliseconds
+      resetAudioAndTimer();
     }
   };
 
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = ((time % 60) - 1).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
+
   return (
-    <div className="flex justify-center">
-      {isPlaying ? (
-        <PauseIcon
-          className="w-14 h-14 cursor-pointer dark:stroke-white"
-          onClick={togglePlayPause}
-        />
-      ) : (
-        <PlayIcon
-          className="w-14 h-14 cursor-pointer dark:stroke-white"
-          onClick={togglePlayPause}
-        />
-      )}
+    <div className="flex items-center justify-center space-x-4">
+      <div className="flex items-center">
+        {isPlaying ? (
+          <PauseIcon
+            className="w-14 h-14 cursor-pointer dark:stroke-white"
+            onClick={togglePlayPause}
+          />
+        ) : (
+          <PlayIcon
+            className="w-14 h-14 cursor-pointer dark:stroke-white"
+            onClick={togglePlayPause}
+          />
+        )}
+      </div>
+      <div className="text-xl font-semibold">{formatTime(remainingTime)}</div>
     </div>
   );
 };

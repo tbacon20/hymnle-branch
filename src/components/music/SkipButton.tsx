@@ -1,9 +1,9 @@
-export const SkipButton = () => {
+export const SkipButton = ({ onSkip }: { onSkip: () => void }) => {
   return (
     <button
       type="button"
       className="flex rounded-md border-2 border-indigo-600 shadow-sm mx-2 px-4 py-2 bg-white text-base font-medium text-indigo-600 hover:bg-gray-200 focus:outline-none sm:text-sm"
-      onClick={() => {}}
+      onClick={onSkip}
     >
       Skip(+1s)
     </button>

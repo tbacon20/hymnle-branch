@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { InfoModal } from "./components/modals/InfoModal";
 import { StatsModal } from "./components/modals/StatsModal";
 import { SettingsModal } from "./components/modals/SettingsModal";
-import { autocomplete } from "./lib/searchbar";
-import { hymnTitles } from "./lib/searchbar";
 
 import {
   WIN_MESSAGES,
@@ -75,6 +73,8 @@ function App() {
   );
   const [isRevealing, setIsRevealing] = useState(false);
   const [guesses, setGuesses] = useState<string[]>([]);
+  const [skippedRows, setSkippedRows] = useState<number[]>([]); // Track skipped rows
+
   // TODO load from local storage in the future
   /*(() => {
     const loaded = loadGameStateFromLocalStorage();
@@ -169,11 +169,26 @@ function App() {
     setCurrentRowClass("");
   };
 
-  const getPlayDuration = (turn: number) => {
-    const baseDuration = 2; 
-    const increment = 2;
-    return baseDuration + (turn - 1) * increment;
+  const playDurations = new Map<number, number>([
+    [1, 1],
+    [2, 3],
+    [3, 5],
+    [4, 10],
+    [5, 15],
+    [6, 30],
+  ]);
+  
+  const getPlayDuration = (turn: number): number => {
+    return playDurations.get(turn) ?? 30; // Default to 30 if turn is not in the map
   };
+  
+  const onSkip = () => {
+    if (currentTurn <= MAX_CHALLENGES) {
+      setSkippedRows((prev) => [...prev, currentTurn]); // Mark the current turn as skipped
+      setCurrentTurn((prev) => prev + 1); // Move to the next turn
+    }
+  };
+
 
   useEffect(() => {
     saveGameStateToLocalStorage({ guesses, solution });
@@ -321,12 +336,12 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
-      <GameRows guesses={guesses} isGameWon={isGameWon}></GameRows>
+        <GameRows guesses={guesses} skippedRows={skippedRows} isGameWon={isGameWon} />
         <PlayButton audioUrl={audioUrl} playDuration={playDuration} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect}></SearchBar>
           <div className="flex justify-between">
-            <SkipButton></SkipButton>
+            <SkipButton onSkip={onSkip} />
             <SubmitButton onClick={onEnter}></SubmitButton>
           </div>
         </div>

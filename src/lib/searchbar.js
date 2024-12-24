@@ -47,13 +47,13 @@ export function autocomplete(inp, arr, onSelect) {
         let x = document.getElementById(this.id + "autocomplete-list");
         if (x) x = x.getElementsByTagName("div");
 
-        if (e.keyCode == 40) { // Arrow DOWN
+        if (e.keyCode === 40) { // Arrow DOWN
             currentFocus++;
             addActive(x);
-        } else if (e.keyCode == 38) { // Arrow UP
+        } else if (e.keyCode === 38) { // Arrow UP
             currentFocus--;
             addActive(x);
-        } else if (e.keyCode == 13) { // Enter
+        } else if (e.keyCode === 13) { // Enter
             e.preventDefault();
             if (currentFocus > -1 && x) {
                 x[currentFocus].click();
@@ -78,7 +78,7 @@ export function autocomplete(inp, arr, onSelect) {
     function closeAllLists(elmnt) {
         let x = document.getElementsByClassName("autocomplete-items");
         for (let i = 0; i < x.length; i++) {
-            if (elmnt != x[i] && elmnt != inp) {
+            if (elmnt !== x[i] && elmnt !== inp) {
                 x[i].parentNode.removeChild(x[i]);
             }
         }

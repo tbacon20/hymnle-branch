@@ -8,28 +8,39 @@ type Props = {
 
 export const PlayButton = ({ audioUrl, playDuration }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(playDuration); // Track remaining time
-  const audioRef = useRef(new Audio(audioUrl));
+  const [isLoading, setIsLoading] = useState(true);
+  const [remainingTime, setRemainingTime] = useState(playDuration);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const audio = audioRef.current;
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+
+    const handleCanPlayThrough = () => {
+      setIsLoading(false);
+    };
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
 
+    audio.addEventListener("canplaythrough", handleCanPlayThrough);
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
 
+    // Start preloading
+    audio.load();
+
     return () => {
+      audio.removeEventListener("canplaythrough", handleCanPlayThrough);
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
       audio.pause();
       if (timerRef.current) clearTimeout(timerRef.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [audioUrl]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -56,6 +67,7 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
   }, [isPlaying]);
 
   const resetAudioAndTimer = () => {
+    if (!audioRef.current) return;
     const audio = audioRef.current;
     audio.pause();
     audio.currentTime = 0;
@@ -70,6 +82,8 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
   };
 
   const togglePlayPause = () => {
+    if (!audioRef.current || isLoading) return;
+
     const audio = audioRef.current;
     if (isPlaying) {
       audio.pause();
@@ -84,14 +98,18 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
     const minutes = Math.floor(time / 60)
       .toString()
       .padStart(2, "0");
-    const seconds = ((time % 60)).toString().padStart(2, "0");
+    const seconds = ((time % 60) - 1).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
 
   return (
     <div className="flex items-center justify-center space-x-4">
       <div className="flex items-center">
-        {isPlaying ? (
+        {isLoading ? (
+          <div className="w-14 h-14 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          </div>
+        ) : isPlaying ? (
           <PauseIcon
             className="w-14 h-14 cursor-pointer dark:stroke-white"
             onClick={togglePlayPause}

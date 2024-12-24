@@ -3,7 +3,7 @@ import { StatBar } from '../stats/StatBar'
 import { Histogram } from '../stats/Histogram'
 import { GameStats } from '../../lib/localStorage'
 import { shareStatus } from '../../lib/share'
-import { tomorrow } from '../../lib/words'
+import { tomorrow } from '../../lib/songs'
 import { BaseModal } from './BaseModal'
 import {
   STATISTICS_TITLE,
@@ -82,8 +82,6 @@ export const StatsModal = ({
                 guesses,
                 isGameLost,
                 isHardMode,
-                isDarkMode,
-                isHighContrastMode,
                 handleShareToClipboard
               )
             }}

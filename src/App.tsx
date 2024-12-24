@@ -6,25 +6,18 @@ import { SettingsModal } from "./components/modals/SettingsModal";
 import {
   WIN_MESSAGES,
   GAME_COPIED_MESSAGE,
-  NOT_ENOUGH_LETTERS_MESSAGE,
-  WORD_NOT_FOUND_MESSAGE,
-  CORRECT_WORD_MESSAGE,
+  CORRECT_SONG_MESSAGE,
   HARD_MODE_ALERT_MESSAGE,
 } from "./constants/strings";
 import {
-  MAX_WORD_LENGTH,
   MAX_CHALLENGES,
-  REVEAL_TIME_MS,
   GAME_LOST_INFO_DELAY,
   WELCOME_INFO_MODAL_MS,
 } from "./constants/settings";
 import {
-  isWordInWordList,
-  isWinningWord,
+  isWinningSong,
   solution,
-  findFirstUnusedReveal,
-  unicodeLength,
-} from "./lib/words";
+} from "./lib/songs";
 import { addStatsForCompletedGame, loadStats } from "./lib/stats";
 import {
   loadGameStateFromLocalStorage,
@@ -32,7 +25,6 @@ import {
   setStoredIsHighContrastMode,
   getStoredIsHighContrastMode,
 } from "./lib/localStorage";
-import { default as GraphemeSplitter } from "grapheme-splitter";
 
 import "./App.css";
 import { AlertContainer } from "./components/alerts/AlertContainer";
@@ -55,11 +47,9 @@ function App() {
   const [currentGuess, setCurrentGuess] = useState("");
   const [currentTurn, setCurrentTurn] = useState(1);
   const [isGameWon, setIsGameWon] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [currentRowClass, setCurrentRowClass] = useState("");
   const [isGameLost, setIsGameLost] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(
     localStorage.getItem("theme")
@@ -71,47 +61,8 @@ function App() {
   const [isHighContrastMode, setIsHighContrastMode] = useState(
     getStoredIsHighContrastMode()
   );
-  const [isRevealing, setIsRevealing] = useState(false);
-  const [guesses, setGuesses] = useState<string[]>([]);
   const [skippedRows, setSkippedRows] = useState<number[]>([]); // Track skipped rows
-
-  // TODO load from local storage in the future
-  /*(() => {
-    const loaded = loadGameStateFromLocalStorage();
-    if (loaded?.solution !== solution) {
-      return [];
-    }
-    const gameWasWon = loaded.guesses.includes(solution);
-    if (gameWasWon) {
-      setIsGameWon(true);
-    }
-
-    if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
-      setIsGameLost(true);
-      showErrorAlert(CORRECT_WORD_MESSAGE(solution), {
-        persist: true,
-      });
-    }
-    return loaded.guesses;
-  });
-
-  // Restarting local storage during development for testing
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Clearing localStorage during development...");
-      localStorage.clear();
-    }
-  }, []);
-  */
-
-  useEffect(() => {
-      // Testing for game won functionality in GameRows.tsx
-      if (guesses.length === 3) {
-        setIsGameWon(true);
-      }
-  });
-
-
+  const [guesses, setGuesses] = useState<string[]>([]);
   const [stats, setStats] = useState(() => loadStats());
 
   const [isHardMode, setIsHardMode] = useState(
@@ -165,47 +116,34 @@ function App() {
     setStoredIsHighContrastMode(isHighContrast);
   };
 
-  const clearCurrentRowClass = () => {
-    setCurrentRowClass("");
-  };
-
   const playDurations = new Map<number, number>([
-    [1, 1],
+    [1, 2],
     [2, 3],
     [3, 5],
-    [4, 10],
-    [5, 15],
-    [6, 30],
+    [4, 11],
+    [5, 16],
+    [6, 31],
   ]);
   
   const getPlayDuration = (turn: number): number => {
-    return playDurations.get(turn) ?? 30; // Default to 30 if turn is not in the map
+    return playDurations.get(turn) ?? 31; // Default to 30 if turn is not in the map
   };
-  
-  const onSkip = () => {
-    if (currentTurn <= MAX_CHALLENGES) {
-      setSkippedRows((prev) => [...prev, currentTurn]); // Mark the current turn as skipped
-      setCurrentTurn((prev) => prev + 1); // Move to the next turn
-    }
-  };
-
 
   useEffect(() => {
-    saveGameStateToLocalStorage({ guesses, solution });
-  }, [guesses]);
+    saveGameStateToLocalStorage({ guesses, solution })
+  }, [guesses])
 
   useEffect(() => {
     if (isGameWon) {
       const winMessage =
         WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)];
-      const delayMs = REVEAL_TIME_MS * MAX_WORD_LENGTH;
-
-      showSuccessAlert(winMessage, {
+      const delayMs = 500;
+      return showSuccessAlert(winMessage, {
         delayMs,
         onClose: () => setIsStatsModalOpen(true),
       });
     }
-
+  
     if (isGameLost) {
       setTimeout(() => {
         setIsStatsModalOpen(true);
@@ -213,115 +151,67 @@ function App() {
     }
   }, [isGameWon, isGameLost, showSuccessAlert]);
 
-  const onChar = (value: string) => {
-    if (
-      unicodeLength(`${currentGuess}${value}`) <= MAX_WORD_LENGTH &&
-      guesses.length < MAX_CHALLENGES &&
-      !isGameWon
-    ) {
-      setCurrentGuess(`${currentGuess}${value}`);
-    }
-  };
-
-  const onDelete = () => {
-    setCurrentGuess(
-      new GraphemeSplitter().splitGraphemes(currentGuess).slice(0, -1).join("")
-    );
-  };
-
   const onSelect = (selectedHymn: string) => {
-    //console.log("Selected hymn in app:",selectedHymn);
     setCurrentGuess(selectedHymn);
   };
 
   const onEnter = () => {
     if (currentGuess) {
-      const hymn = HYMNS.find((h: { title: string; }) => h.title === currentGuess);
-
-      if (hymn && currentTurn < MAX_CHALLENGES) {
-        // TODO add checks that game is not over/not too many guesses etc
-        // TODO update to use localStorage. This is a Temp method for setting guess to guesses array
-        //console.log('You selected:',currentGuess);
-        setGuesses((prevGuesses) => [...prevGuesses, currentGuess]); // Update guesses array with valid hymn title
-        setCurrentTurn((prevTurn) => prevTurn + 1); // Go to the next turn
-      } else if (guesses.length >= MAX_CHALLENGES) {
-        // TODO use the modal instead of alert
-        alert("You have reached the maximum number of guesses.");
+      const hymn = HYMNS.find((h: { title: string }) => h.title === currentGuess);
+      const winningSong = isWinningSong(currentGuess);  
+      if (hymn && currentTurn <= MAX_CHALLENGES) {
+        setGuesses((prevGuesses) => {
+          const updatedGuesses = [...prevGuesses, currentGuess];
+          if (winningSong) {
+            setStats(addStatsForCompletedGame(stats, updatedGuesses.length));
+            setIsGameWon(true);
+          }
+          if (guesses.length === MAX_CHALLENGES - 1) {
+            setStats(addStatsForCompletedGame(stats, guesses.length + 1))
+            setIsGameLost(true)
+            showErrorAlert(CORRECT_SONG_MESSAGE(solution), {
+              persist: true,
+              delayMs: 500,
+            })
+          }
+          return updatedGuesses;
+        });
+        setCurrentTurn((prevTurn) => prevTurn + 1);
+      } else if (guesses.length > MAX_CHALLENGES) {
+        return showErrorAlert("No more guesses left");
       } else {
-        alert("Hymn title not found.");
-      } 
+        return showErrorAlert("Hymn title not found");
+      }
     } else {
-      alert("No hymn selected.");
+      return showErrorAlert("No hymn selected");
     }
-
+  
     const searchBar = document.getElementById("searchBarInput") as HTMLInputElement;
     if (searchBar) {
       searchBar.value = "";
     }
     setCurrentGuess("");
-    // TODO modify this to work with the hymnle app
-    /*
-    if (isGameWon || isGameLost) {
-      return;
-    }
-
-    if (!(unicodeLength(currentGuess) === MAX_WORD_LENGTH)) {
-      setCurrentRowClass("jiggle");
-      return showErrorAlert(NOT_ENOUGH_LETTERS_MESSAGE, {
-        onClose: clearCurrentRowClass,
+  };
+  
+  const onSkip = () => {
+    if (currentTurn <= MAX_CHALLENGES) {
+      setSkippedRows((prev) => [...prev, currentTurn - 1]);
+      setGuesses((prevGuesses) => {
+        const updatedGuesses = [...prevGuesses, "SKIPPED"];
+        if (guesses.length === MAX_CHALLENGES - 1) {
+          setStats(addStatsForCompletedGame(stats, guesses.length + 1))
+          setIsGameLost(true)
+          showErrorAlert(CORRECT_SONG_MESSAGE(solution), {
+            persist: true,
+            delayMs: 500,
+          })
+        }
+        return updatedGuesses;
       });
+      setCurrentTurn((prev) => prev + 1);
+    } else {
+      return showErrorAlert("No more guesses left");
     }
-
-    if (!isWordInWordList(currentGuess)) {
-      setCurrentRowClass("jiggle");
-      return showErrorAlert(WORD_NOT_FOUND_MESSAGE, {
-        onClose: clearCurrentRowClass,
-      });
-    }
-
-    // enforce hard mode - all guesses must contain all previously revealed letters
-    if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
-      if (firstMissingReveal) {
-        setCurrentRowClass("jiggle");
-        return showErrorAlert(firstMissingReveal, {
-          onClose: clearCurrentRowClass,
-        });
-      }
-    }
-
-    setIsRevealing(true);
-    // turn this back off after all
-    // chars have been revealed
-    setTimeout(() => {
-      setIsRevealing(false);
-    }, REVEAL_TIME_MS * MAX_WORD_LENGTH);
-
-    const winningWord = isWinningWord(currentGuess);
-
-    if (
-      unicodeLength(currentGuess) === MAX_WORD_LENGTH &&
-      guesses.length < MAX_CHALLENGES &&
-      !isGameWon
-    ) {
-      setGuesses([...guesses, currentGuess]);
-      setCurrentGuess("");
-
-      if (winningWord) {
-        setStats(addStatsForCompletedGame(stats, guesses.length));
-        return setIsGameWon(true);
-      }
-
-      if (guesses.length === MAX_CHALLENGES - 1) {
-        setStats(addStatsForCompletedGame(stats, guesses.length + 1));
-        setIsGameLost(true);
-        showErrorAlert(CORRECT_WORD_MESSAGE(solution), {
-          persist: true,
-          delayMs: REVEAL_TIME_MS * MAX_WORD_LENGTH + 1,
-        });
-      }
-    }
-    */
   };
 
   //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"

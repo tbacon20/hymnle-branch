@@ -35,7 +35,7 @@ import { SearchBar } from "./components/music/SearchBar";
 import { SubmitButton } from "./components/music/SubmitButton";
 import { SkipButton } from "./components/music/SkipButton";
 import { GameRows } from "./components/grid/GameRows";
-import { HYMNS } from "./constants/hymn";
+import { HYMNS } from "./constants/hymnBook";
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -229,10 +229,10 @@ function App() {
         <GameRows guesses={guesses} skippedRows={skippedRows} isGameWon={isGameWon} />
         <PlayButton audioUrl={audioUrl} playDuration={playDuration} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
-          <SearchBar onSelect={onSelect}></SearchBar>
+        <SearchBar onSelect={onSelect} isDisabled={isGameWon || isGameLost} />
           <div className="flex justify-between">
-            <SkipButton onSkip={onSkip} />
-            <SubmitButton onClick={onEnter}></SubmitButton>
+            <SkipButton onSkip={onSkip} isDisabled={isGameWon || isGameLost} />
+            <SubmitButton onClick={onEnter} isDisabled={isGameWon || isGameLost} />
           </div>
         </div>
         <InfoModal

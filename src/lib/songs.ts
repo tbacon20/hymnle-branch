@@ -1,4 +1,4 @@
-import { HYMNS } from '../constants/hymn'
+import { HYMNS } from '../constants/hymnBook'
 
 export const isWinningSong = (song: string) => {
   return solution === song

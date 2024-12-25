@@ -1,20 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { hymnTitles } from "../../lib/searchbar";
 import { autocomplete } from "../../lib/searchbar";
 
 type SearchBarProps = {
-  onSelect: (guess: string) => void; // Accept onSelect prop
+  onSelect: (guess: string) => void;
+  isDisabled: boolean;
 };
 
-export const SearchBar = ({ onSelect }: SearchBarProps) => {
+export const SearchBar = ({ onSelect, isDisabled }: SearchBarProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    const inputElement = document.getElementById("searchBarInput") as HTMLInputElement;
-    autocomplete(inputElement, hymnTitles, onSelect); // Pass onSelect to autocomplete
+    if (inputRef.current) {
+      autocomplete(inputRef.current, hymnTitles, onSelect);
+    }
   }, [onSelect]);
 
   return (
     <div className="flex justify-center p-2 autocomplete">
-        <input type="text" id="searchBarInput" placeholder="Search for a song..." className="w-full"/>
+      <input
+        ref={inputRef}
+        type="text"
+        id="searchBarInput"
+        placeholder="Search for a song..."
+        className={`w-full ${isDisabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+        disabled={isDisabled}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { HYMNS } from '../constants/hymn';
+import { HYMNS } from '../constants/hymnBook';
 
 export function autocomplete(inp, arr, onSelect) {
     let currentFocus;

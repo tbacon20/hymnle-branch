@@ -1,4 +1,4 @@
-import { HYMNS } from "../../constants/hymn";
+import { HYMNS } from "../../constants/hymnBook";
 import { CorrectRow } from "./CorrectRow";
 import { EmptyRow } from "./EmptyRow";
 import { IncorrectRow } from "./IncorrectRow";

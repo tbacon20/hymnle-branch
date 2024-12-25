@@ -16,6 +16,7 @@ export const InfoModal = ({ isOpen, handleClose }: Props) => {
           target="_blank"
           className="underline font-bold"
           rel="noreferrer"
+          tabIndex={-1}
         >
           Heardle
         </a>{" "}

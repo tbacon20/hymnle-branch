@@ -35,7 +35,8 @@ import { SearchBar } from "./components/music/SearchBar";
 import { SubmitButton } from "./components/music/SubmitButton";
 import { SkipButton } from "./components/music/SkipButton";
 import { GameRows } from "./components/grid/GameRows";
-import { HYMNS } from "./constants/hymnBook";
+import { songTitles } from "./lib/searchbar";
+import { SONGS } from "./constants/songs";
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -61,7 +62,7 @@ function App() {
   const [isHighContrastMode, setIsHighContrastMode] = useState(
     getStoredIsHighContrastMode()
   );
-  const [skippedRows, setSkippedRows] = useState<number[]>([]); // Track skipped rows
+  const [skippedRows, setSkippedRows] = useState<number[]>([]);
   const [guesses, setGuesses] = useState<string[]>([]);
   const [stats, setStats] = useState(() => loadStats());
 
@@ -70,8 +71,6 @@ function App() {
       ? localStorage.getItem("gameMode") === "hard"
       : false
   );
-
-  // moved to searchbar.tsx useEffect(()=> {  autocomplete(document.getElementById("searchBarInput"), hymnTitles);});
 
   useEffect(() => {
     // if no game state on load,
@@ -126,7 +125,7 @@ function App() {
   ]);
   
   const getPlayDuration = (turn: number): number => {
-    return playDurations.get(turn) ?? 31; // Default to 30 if turn is not in the map
+    return playDurations.get(turn) ?? 31;
   };
 
   useEffect(() => {
@@ -157,7 +156,10 @@ function App() {
 
   const onEnter = () => {
     if (currentGuess) {
-      const hymn = HYMNS.find((h: { title: string }) => h.title === currentGuess);
+      if (guesses.includes(currentGuess)) {
+        return showErrorAlert("You've already guessed this song");
+      }
+      const hymn = songTitles.find((s => s === currentGuess));
       const winningSong = isWinningSong(currentGuess);  
       if (hymn && currentTurn <= MAX_CHALLENGES) {
         setGuesses((prevGuesses) => {
@@ -215,7 +217,7 @@ function App() {
   };
 
   //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"
-  const audioUrl = HYMNS[0]?.mp3_url;
+  const audioUrl = SONGS[0]?.mp3_url;
   const playDuration = getPlayDuration(currentTurn);
 
   return (

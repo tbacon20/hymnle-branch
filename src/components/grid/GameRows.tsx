@@ -1,9 +1,10 @@
-import { HYMNS } from "../../constants/hymnBook";
+import { songTitles } from "../../lib/searchbar";
 import { CorrectRow } from "./CorrectRow";
 import { EmptyRow } from "./EmptyRow";
 import { IncorrectRow } from "./IncorrectRow";
 import { SkippedRow } from "./SkippedRow";
 import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 type GameRowsProps = {
   guesses: string[];
@@ -17,42 +18,44 @@ export const GameRows = ({ guesses, skippedRows, isGameWon }: GameRowsProps) => 
   useEffect(() => {
     const updatedGuessIds = guesses.map((guess) => {
       if (guess === "SKIPPED") return null;
-      const hymnIndex = HYMNS.findIndex((hymn) => hymn.title === guess);
-      return hymnIndex !== -1 ? hymnIndex : null;
+      const songIndex = songTitles.findIndex((song) => song === guess);
+      return songIndex !== -1 ? songIndex : null;
     });
     setGuessIds(updatedGuessIds);
   }, [guesses]);
 
-  const combinedRows = Array.from({ length: 6 }).map((_, index) => {
-    if (skippedRows.includes(index)) {
-      return { type: "skipped", id: `skipped-${index}` };
-    } else if (index < guesses.length) {
-      const guessId = guessIds[index];
-      if (guessId === null) {
+  const combinedRows = useMemo(() => {
+    return Array.from({ length: 6 }).map((_, index) => {
+      if (skippedRows.includes(index)) {
         return { type: "skipped", id: `skipped-${index}` };
+      } else if (index < guesses.length) {
+        const guessId = guessIds[index];
+        if (guessId === null) {
+          return { type: "skipped", id: `skipped-${index}` };
+        }
+        return {
+          type: "guess",
+          id: guessId,
+          isCorrect: index === guesses.length - 1 && isGameWon,
+        };
+      } else {
+        return { type: "empty", id: `empty-${index}` };
       }
-      return {
-        type: "guess",
-        id: guessId,
-        isCorrect: index === guesses.length - 1 && isGameWon,
-      };
-    } else {
-      return { type: "empty", id: `empty-${index}` };
-    }
-  });
+    });
+  }, [guesses, skippedRows, guessIds, isGameWon]);
 
   return (
     <div className="max-w-screen-sm w-full mx-auto">
       {combinedRows.map((row) => {
         switch (row.type) {
           case "skipped":
-            return <SkippedRow key={row.id} hymn={null} />;
+            return <SkippedRow key={row.id}/>;
           case "guess":
             if (typeof row.id === "number") {
               return row.isCorrect ? (
-                <CorrectRow key={row.id} hymn={HYMNS[row.id]} />
+                <CorrectRow key={row.id} hymn={songTitles[row.id]} />
               ) : (
-                <IncorrectRow key={row.id} hymn={HYMNS[row.id]} />
+                <IncorrectRow key={row.id} hymn={songTitles[row.id]} />
               );
             }
             break;

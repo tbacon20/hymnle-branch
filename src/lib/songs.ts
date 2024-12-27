@@ -1,4 +1,4 @@
-import { HYMNS } from '../constants/hymnBook'
+import { SONGS } from '../constants/songs'
 
 export const isWinningSong = (song: string) => {
   return solution === song
@@ -11,13 +11,15 @@ export const getSongOfDay = () => {
   const msInDay = 86400000
   const index = Math.floor((now - epochMs) / msInDay)
   const nextday = (index + 1) * msInDay + epochMs
-  const solutionDict = HYMNS[0]
+  const song = SONGS[0]
+  let bookSuffix = song.book === "CHILDREN'S" ? " (Children's)" : "";
+  let solution = `${song.number}. ${song.title}${bookSuffix}`;
 
   return {
-    solution: solutionDict.title,
+    solution: solution,
     solutionIndex: index,
     tomorrow: nextday,
-    url: solutionDict.url
+    url: song.url
   }
 }
 

@@ -2,8 +2,8 @@ import { PlayIcon, PauseIcon } from "@heroicons/react/outline";
 import { useEffect, useState, useRef } from "react";
 
 type Props = {
-  audioUrl: string; // URL of the audio file to play
-  playDuration: number; // Duration to play audio in seconds
+  audioUrl: string;
+  playDuration: number;
 };
 
 export const PlayButton = ({ audioUrl, playDuration }: Props) => {

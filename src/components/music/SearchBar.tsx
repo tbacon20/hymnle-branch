@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { hymnTitles } from "../../lib/searchbar";
+import { songTitles } from "../../lib/searchbar";
 import { autocomplete } from "../../lib/searchbar";
 
 type SearchBarProps = {
@@ -12,7 +12,7 @@ export const SearchBar = ({ onSelect, isDisabled }: SearchBarProps) => {
 
   useEffect(() => {
     if (inputRef.current) {
-      autocomplete(inputRef.current, hymnTitles, onSelect);
+      autocomplete(inputRef.current, songTitles, onSelect);
     }
   }, [onSelect]);
 

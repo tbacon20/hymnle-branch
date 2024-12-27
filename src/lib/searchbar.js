@@ -1,12 +1,14 @@
-import { HYMNS } from '../constants/hymnBook';
+import { SONGS } from '../constants/songs';
 
 export function autocomplete(inp, arr, onSelect) {
     let currentFocus;
 
-    inp.addEventListener("input", function(e) {
-        let a, b, val = this.value;
+    inp.addEventListener("input", function (e) {
+        let a, b, val = this.value.replace(/[`’‘]/g, "'");
         closeAllLists();
-        if (!val) { return false; }
+        if (!val) {
+            return false;
+        }
         currentFocus = -1;
 
         a = document.createElement("DIV");
@@ -21,20 +23,20 @@ export function autocomplete(inp, arr, onSelect) {
 
         let matchCount = 0;
         for (let i = 0; i < arr.length && matchCount < 6; i++) {
-            if (arr[i].substr(0, val.length).toUpperCase() === val.toUpperCase()) {
+            let normalizedItem = arr[i].replace(/[`’‘]/g, "'"); 
+            if (normalizedItem.toUpperCase().includes(val.toUpperCase())) { 
                 b = document.createElement("DIV");
-                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                b.innerHTML += arr[i].substr(val.length);
-                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 
-                b.addEventListener("click", function(e) {
-                    const selectedHymn = this.getElementsByTagName("input")[0].value;
+                const regex = new RegExp(`(${val})`, "i");
+                b.innerHTML = normalizedItem.replace(regex, "<strong>$1</strong>"); 
+                b.innerHTML += `<input type='hidden' value="${arr[i].replace(/"/g, '&quot;')}">`;
 
-                    inp.value = selectedHymn;
+                b.addEventListener("click", function (e) {
+                    const selectedSong = this.getElementsByTagName("input")[0].value;
+
+                    inp.value = selectedSong;
                     closeAllLists();
-
-                    //console.log("hymn from searchbar:",selectedHymn);
-                    onSelect(selectedHymn);
+                    onSelect(selectedSong);
                 });
 
                 a.appendChild(b);
@@ -43,7 +45,7 @@ export function autocomplete(inp, arr, onSelect) {
         }
     });
 
-    inp.addEventListener("keydown", function(e) {
+    inp.addEventListener("keydown", function (e) {
         let x = document.getElementById(this.id + "autocomplete-list");
         if (x) x = x.getElementsByTagName("div");
 
@@ -89,4 +91,7 @@ export function autocomplete(inp, arr, onSelect) {
     });
 }
 
-export var hymnTitles = HYMNS.map(hymn => hymn.title);
+export var songTitles = SONGS.map(song => {
+    let bookSuffix = song.book === "CHILDREN'S" ? " (Children's)" : "";
+    return `${song.number}. ${song.title}${bookSuffix}`;
+});

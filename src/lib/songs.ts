@@ -19,8 +19,9 @@ export const getSongOfDay = () => {
     solution: solution,
     solutionIndex: index,
     tomorrow: nextday,
-    url: song.url
+    solutionMp3Url: song.mp3_url,
+    songUrl: song.url
   }
 }
 
-export const { solution, solutionIndex, tomorrow, url } = getSongOfDay()
+export const { solution, solutionIndex, tomorrow, solutionMp3Url, songUrl } = getSongOfDay()

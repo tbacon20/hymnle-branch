@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { InfoModal } from "./components/modals/InfoModal";
 import { StatsModal } from "./components/modals/StatsModal";
+import { SongModal } from "./components/modals/SongModal";
 import { SettingsModal } from "./components/modals/SettingsModal";
 
 import {
@@ -11,12 +12,12 @@ import {
 } from "./constants/strings";
 import {
   MAX_CHALLENGES,
-  GAME_LOST_INFO_DELAY,
   WELCOME_INFO_MODAL_MS,
 } from "./constants/settings";
 import {
   isWinningSong,
   solution,
+  solutionMp3Url,
 } from "./lib/songs";
 import { addStatsForCompletedGame, loadStats } from "./lib/stats";
 import {
@@ -36,7 +37,6 @@ import { SubmitButton } from "./components/music/SubmitButton";
 import { SkipButton } from "./components/music/SkipButton";
 import { GameRows } from "./components/grid/GameRows";
 import { songTitles } from "./lib/searchbar";
-import { SONGS } from "./constants/songs";
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -50,6 +50,7 @@ function App() {
   const [isGameWon, setIsGameWon] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+  const [isSongModalOpen, setIsSongModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(
@@ -63,7 +64,6 @@ function App() {
     getStoredIsHighContrastMode()
   );
   const [skippedRows, setSkippedRows] = useState<number[]>([]);
-  const [guesses, setGuesses] = useState<string[]>([]);
   const [stats, setStats] = useState(() => loadStats());
 
   const [isHardMode, setIsHardMode] = useState(
@@ -71,6 +71,25 @@ function App() {
       ? localStorage.getItem("gameMode") === "hard"
       : false
   );
+
+  const [guesses, setGuesses] = useState<string[]>(() => {
+    const loaded = loadGameStateFromLocalStorage()
+    console.log(loaded)
+    if (loaded?.solution !== solution) {
+      return []
+    }
+    const gameWasWon = loaded.guesses.includes(solution)
+    if (gameWasWon) {
+      setIsGameWon(true)
+    }
+    if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
+      setIsGameLost(true)
+      showErrorAlert(CORRECT_SONG_MESSAGE, {
+        delayMs: 500,
+      })
+    }
+    return loaded.guesses
+  })
 
   useEffect(() => {
     // if no game state on load,
@@ -139,14 +158,15 @@ function App() {
       const delayMs = 500;
       return showSuccessAlert(winMessage, {
         delayMs,
-        onClose: () => setIsStatsModalOpen(true),
+        onClose: () => setIsSongModalOpen(true),
       });
     }
   
     if (isGameLost) {
+      const delayMs = 500;
       setTimeout(() => {
-        setIsStatsModalOpen(true);
-      }, GAME_LOST_INFO_DELAY);
+        setIsSongModalOpen(true);
+      }, delayMs);
     }
   }, [isGameWon, isGameLost, showSuccessAlert]);
 
@@ -161,23 +181,21 @@ function App() {
       }
       const hymn = songTitles.find((s => s === currentGuess));
       const winningSong = isWinningSong(currentGuess);  
-      if (hymn && currentTurn <= MAX_CHALLENGES) {
-        setGuesses((prevGuesses) => {
-          const updatedGuesses = [...prevGuesses, currentGuess];
-          if (winningSong) {
-            setStats(addStatsForCompletedGame(stats, updatedGuesses.length));
-            setIsGameWon(true);
-          }
-          if (guesses.length === MAX_CHALLENGES - 1) {
-            setStats(addStatsForCompletedGame(stats, guesses.length + 1))
-            setIsGameLost(true)
-            showErrorAlert(CORRECT_SONG_MESSAGE(solution), {
-              persist: true,
-              delayMs: 500,
-            })
-          }
-          return updatedGuesses;
-        });
+      if (hymn && currentTurn < MAX_CHALLENGES && !isGameWon) {
+        setGuesses([...guesses, currentGuess])
+        setCurrentGuess('')
+        if (winningSong) {
+          console.log(guesses)
+          setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+          setIsGameWon(true);
+        }
+        else if (guesses.length === MAX_CHALLENGES - 1) {
+          setStats(addStatsForCompletedGame(stats, guesses.length + 1))
+          setIsGameLost(true)
+          showErrorAlert(CORRECT_SONG_MESSAGE, {
+            delayMs: 500,
+          })
+        }
         setCurrentTurn((prevTurn) => prevTurn + 1);
       } else if (guesses.length > MAX_CHALLENGES) {
         return showErrorAlert("No more guesses left");
@@ -203,7 +221,7 @@ function App() {
         if (guesses.length === MAX_CHALLENGES - 1) {
           setStats(addStatsForCompletedGame(stats, guesses.length + 1))
           setIsGameLost(true)
-          showErrorAlert(CORRECT_SONG_MESSAGE(solution), {
+          showErrorAlert(CORRECT_SONG_MESSAGE, {
             persist: true,
             delayMs: 500,
           })
@@ -216,8 +234,6 @@ function App() {
     }
   };
 
-  //TODO update audioURL based on selected hymn. Was "https://assets.churchofjesuschrist.org/1b/13/1b13523680a0201653cfc366afbef38cde7fe1aa/the_morning_breaks_vocal_accompaniment_eng.mp3"
-  const audioUrl = SONGS[0]?.mp3_url;
   const playDuration = getPlayDuration(currentTurn);
 
   return (
@@ -229,7 +245,7 @@ function App() {
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
         <GameRows guesses={guesses} skippedRows={skippedRows} isGameWon={isGameWon} />
-        <PlayButton audioUrl={audioUrl} playDuration={playDuration} />
+        <PlayButton audioUrl={solutionMp3Url} playDuration={playDuration} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
         <SearchBar onSelect={onSelect} isDisabled={isGameWon || isGameLost} />
           <div className="flex justify-between">
@@ -246,6 +262,21 @@ function App() {
           handleClose={() => setIsStatsModalOpen(false)}
           guesses={guesses}
           gameStats={stats}
+          isGameLost={isGameLost}
+          isGameWon={isGameWon}
+          handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}
+          isHardMode={isHardMode}
+          isDarkMode={isDarkMode}
+          isHighContrastMode={isHighContrastMode}
+          numberOfGuessesMade={guesses.length}
+        />
+        <SongModal
+          isOpen={isSongModalOpen}
+          handleClose= {() => {
+            setIsSongModalOpen(false)
+            setIsStatsModalOpen(true)
+          }}
+          guesses={guesses}
           isGameLost={isGameLost}
           isGameWon={isGameWon}
           handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}

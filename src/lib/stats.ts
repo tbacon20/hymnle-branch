@@ -13,7 +13,6 @@ export const addStatsForCompletedGame = (
 ) => {
   // Count is number of incorrect guesses before end.
   const stats = { ...gameStats }
-
   stats.totalGames += 1
 
   if (count >= MAX_CHALLENGES) {
@@ -21,7 +20,7 @@ export const addStatsForCompletedGame = (
     stats.currentStreak = 0
     stats.gamesFailed += 1
   } else {
-    stats.winDistribution[count] += 1
+    stats.winDistribution[count - 1] += 1
     stats.currentStreak += 1
 
     if (stats.bestStreak < stats.currentStreak) {

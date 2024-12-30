@@ -1,4 +1,10 @@
 import { GAME_TITLE } from '../constants/strings';
+import { UAParser } from 'ua-parser-js';
+
+const webShareApiDeviceTypes: string[] = ['mobile', 'smarttv', 'wearable'];
+const parser = new UAParser();
+const browser = parser.getBrowser();
+const device = parser.getDevice();
 
 export const shareStatus = (
   guesses: string[],
@@ -17,8 +23,8 @@ export const shareStatus = (
   const generateEmojiString = (guesses: string[]) => {
     return guesses
       .map((guess, index) => {
-        if (lost) return guess === 'SKIPPED' ? '⏭️' : '❌';
-        if (index === guesses.length - 1) return '✅';
+        if (lost) return guess === 'SKIPPED' ? '⏭️' : '❌'; // All guesses are ❌ if lost
+        if (index === guesses.length - 1) return '✅'; // Last guess is ✅ if not lost
         return guess === 'SKIPPED' ? '⏭️' : '❌';
       })
       .join('');
@@ -33,11 +39,32 @@ export const shareStatus = (
         isHardMode ? ' on hard mode' : ''
       }!\n${emojiString}\nTry to beat my score at https://hymnle.com`;
 
-  // Copy text to clipboard
-  navigator.clipboard.writeText(textToShare).then(() => {
-    // Trigger success alert
+  const shareData = { text: textToShare };
+
+  let shareSuccess = false;
+
+  try {
+    if (attemptShare(shareData)) {
+      navigator.share(shareData);
+      shareSuccess = true;
+    }
+  } catch (error) {
+    shareSuccess = false;
+  }
+
+  if (!shareSuccess) {
+    navigator.clipboard.writeText(textToShare);
     handleShareToClipboard();
-  }).catch((error) => {
-    console.error("Failed to copy text to clipboard:", error);
-  });
+  }
+};
+
+const attemptShare = (shareData: object) => {
+  return (
+    // Exclude Firefox Mobile due to Web Share API issues
+    browser.name?.toUpperCase().indexOf('FIREFOX') === -1 &&
+    webShareApiDeviceTypes.indexOf(device.type ?? '') !== -1 &&
+    navigator.canShare &&
+    navigator.canShare(shareData) &&
+    navigator.share
+  );
 };

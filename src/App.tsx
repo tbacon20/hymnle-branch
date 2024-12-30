@@ -86,7 +86,6 @@ function App() {
 
   const [guesses, setGuesses] = useState<string[]>(() => {
     const loaded = loadGameStateFromLocalStorage()
-    console.log(loaded)
     if (loaded?.solution !== solution) {
       return []
     }
@@ -139,7 +138,7 @@ function App() {
     [1, 2],
     [2, 3],
     [3, 5],
-    [4, 11],
+    [4, 9],
     [5, 16],
     [6, 31],
     [7, 31],
@@ -247,6 +246,17 @@ function App() {
 
   const playDuration = getPlayDuration(currentTurn);
 
+
+  const calculateTimeAdded = (turn: number): number => {
+    const playDurations = isHardMode ? hardModePlayDurations : normalPlayDurations;
+    const currentDuration = playDurations.get(turn) ?? 0;
+    const nextDuration = playDurations.get(turn + 1) ?? 0;
+    return nextDuration - currentDuration;
+  };
+  
+  const timeAdded = calculateTimeAdded(currentTurn);
+
+
   return (
     <div className="h-screen flex flex-col">
       <Navbar
@@ -272,7 +282,7 @@ function App() {
               </div>
             ) : (
               <>
-                <SkipButton onSkip={onSkip} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
+                <SkipButton onSkip={onSkip} timeAdded={timeAdded} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
                 <SubmitButton onClick={onEnter} isDisabled={isGameWon || isGameLost} />
               </>
             )}

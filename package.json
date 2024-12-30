@@ -25,14 +25,14 @@
     "yarn": "^1.22.18"
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "CI=false react-scripts build",
     "eject": "react-scripts eject",
     "fix": "prettier --write src",
     "lint": "prettier --check src",
     "start": "react-scripts start",
     "test": "react-scripts test",
     "prepare": "husky install",
-    "deploy": "aws s3 sync build/ s3://hymnle.com"
+    "deploy": "aws s3 sync build/ s3://hymnle.com && aws cloudfront create-invalidation --distribution-id EPK6D8L9Z7YPE --paths '/*'"
   },
   "eslintConfig": {
     "extends": [

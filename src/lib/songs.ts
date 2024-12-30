@@ -2,9 +2,8 @@ import { SONGS } from '../constants/songs';
 
 export const getSongOfDay = () => {
   const epochMs = new Date(2024, 0).valueOf(); // January 1, 2024 Game Epoch
-  const now = Date.now();
   const msInDay = 86400000;
-  const index = Math.floor((now - epochMs) / msInDay);
+  const index = Math.floor(Math.random() * SONGS.length);
   const nextday = (index + 1) * msInDay + epochMs;
 
   const song = SONGS[index % SONGS.length];

@@ -26,7 +26,7 @@ export const SongModal = ({
   const removeNumberPrefix = (title: string) => title.replace(/^\d+[a-zA-Z]?\.\s*/, "");
 
   return (
-    <BaseModal title="Your Guesses:" isOpen={isOpen} handleClose={handleClose}>
+    <BaseModal title="Your Guesses" isOpen={isOpen} handleClose={handleClose}>
       {generateResultEmojis(guesses, isGameLost, removeNumberPrefix, isDarkMode)}
       <div className={`mt-5 sm:mt-6 ${isDarkMode ? "text-gray-300" : "text-black"}`}>
         Listen to the full song{" "}
@@ -90,7 +90,7 @@ export const generateResultEmojis = (
         return (
           <div
             key={index}
-            className="flex items-center space-x-2 w-full max-w-xs justify-start"
+            className="flex items-center space-x-1 w-full max-w-xs justify-start"
           >
             <span className="w-6 text-lg text-center">
               {guess === "SKIPPED" ? "⏭️" : !isGameLost && index === guesses.length - 1 ? "✅" : "❌"}

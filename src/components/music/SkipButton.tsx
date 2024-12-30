@@ -1,10 +1,11 @@
 type SkipButtonProps = {
   onSkip: () => void;
   isDisabled: boolean;
-  isDarkMode: boolean; // Added dark mode prop
+  isDarkMode: boolean;
+  timeAdded: number;
 };
 
-export const SkipButton = ({ onSkip, isDisabled, isDarkMode }: SkipButtonProps) => {
+export const SkipButton = ({ onSkip, isDisabled, isDarkMode, timeAdded }: SkipButtonProps) => {
   return (
     <button
       type="button"
@@ -18,7 +19,7 @@ export const SkipButton = ({ onSkip, isDisabled, isDarkMode }: SkipButtonProps) 
       onClick={onSkip}
       disabled={isDisabled}
     >
-      Skip
+      Skip{timeAdded > 0 ? ` (+${timeAdded}s)` : ""}
     </button>
   );
 };

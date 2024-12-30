@@ -20,14 +20,13 @@ export const InfoModal = ({ isOpen, handleClose }: Props) => {
         >
           Heardle
         </a>{" "}
-        inspired game but with songs from The Church of Jesus Christ of
-        Latter-day Saints.
+        inspired game but with songs from the Hymnal or The Children's Songbook
       </p>
 
       <div className="flex justify-center mb-1 mt-4">
       <MusicNoteIcon className = "text-gray-600 dark:text-gray-300 mr-2 w-7"/>
         <p className="text-sm text-gray-500 dark:text-gray-300 text-left">
-        Listen to the intro of the hymn, then guess the correct title.
+        Listen to the intro of the song, then guess the correct title.
         </p>
       </div>
 
@@ -49,8 +48,8 @@ export const InfoModal = ({ isOpen, handleClose }: Props) => {
 
       <div className="flex justify-center mb-1 mt-4">
         <p className="text-sm text-gray-500 dark:text-gray-300">
-          Each day there will be a random song from the Hymn Book or Children's Songbook, and you'll have 6 tries to guess it!
-        </p>
+        All the songs used in the game are copyrighted and belong to their respective owners.
+      </p>
       </div>
 
       <div className="flex justify-center mb-1 mt-4">

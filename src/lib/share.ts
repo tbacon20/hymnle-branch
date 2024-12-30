@@ -1,12 +1,4 @@
-import { solutionIndex } from './songs'
-import { GAME_TITLE } from '../constants/strings'
-import { MAX_CHALLENGES } from '../constants/settings'
-import { UAParser } from 'ua-parser-js'
-
-const webShareApiDeviceTypes: string[] = ['mobile', 'smarttv', 'wearable']
-const parser = new UAParser()
-const browser = parser.getBrowser()
-const device = parser.getDevice()
+import { GAME_TITLE } from '../constants/strings';
 
 export const shareStatus = (
   guesses: string[],
@@ -14,39 +6,38 @@ export const shareStatus = (
   isHardMode: boolean,
   handleShareToClipboard: () => void
 ) => {
-  const wordleNumber = solutionIndex - 87
-  const textToShare =
-    `${GAME_TITLE} #${wordleNumber} ${
-      lost ? 'X' : guesses.length
-    }/${MAX_CHALLENGES}${isHardMode ? '*' : ''}\n\n` +
-    + '\n\n Guess the song at https://hymnle.com'
+  const formatDate = () => {
+    const today = new Date();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    const year = today.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
 
-  const shareData = { text: textToShare }
+  const generateEmojiString = (guesses: string[]) => {
+    return guesses
+      .map((guess, index) => {
+        if (lost) return guess === 'SKIPPED' ? '⏭️' : '❌';
+        if (index === guesses.length - 1) return '✅';
+        return guess === 'SKIPPED' ? '⏭️' : '❌';
+      })
+      .join('');
+  };
 
-  let shareSuccess = false
+  const emojiString = generateEmojiString(guesses);
+  const todayDate = formatDate();
 
-  try {
-    if (attemptShare(shareData)) {
-      navigator.share(shareData)
-      shareSuccess = true
-    }
-  } catch (error) {
-    shareSuccess = false
-  }
+  const textToShare = lost
+    ? `${GAME_TITLE} ${todayDate}, oh no, I lost!\n${emojiString}\nTry to beat my score at https://hymnle.com`
+    : `${GAME_TITLE} ${todayDate}, I solved it in ${guesses.length} tries${
+        isHardMode ? ' on hard mode' : ''
+      }!\n${emojiString}\nTry to beat my score at https://hymnle.com`;
 
-  if (!shareSuccess) {
-    navigator.clipboard.writeText(textToShare)
-    handleShareToClipboard()
-  }
-}
-
-const attemptShare = (shareData: object) => {
-  return (
-    // Deliberately exclude Firefox Mobile, because its Web Share API isn't working correctly
-    browser.name?.toUpperCase().indexOf('FIREFOX') === -1 &&
-    webShareApiDeviceTypes.indexOf(device.type ?? '') !== -1 &&
-    navigator.canShare &&
-    navigator.canShare(shareData) &&
-    navigator.share
-  )
-}
+  // Copy text to clipboard
+  navigator.clipboard.writeText(textToShare).then(() => {
+    // Trigger success alert
+    handleShareToClipboard();
+  }).catch((error) => {
+    console.error("Failed to copy text to clipboard:", error);
+  });
+};

@@ -1,9 +1,9 @@
 import { SONGS } from '../constants/songs';
 
-export function autocomplete(inp, arr, onSelect) {
+export function autocomplete(inp, arr, onSelect, isDarkMode) {
     let currentFocus;
 
-    inp.addEventListener("input", function (e) {
+    inp.addEventListener("input", function () {
         let a, b, val = this.value.replace(/[`’‘]/g, "'");
         closeAllLists();
         if (!val) {
@@ -13,7 +13,7 @@ export function autocomplete(inp, arr, onSelect) {
 
         a = document.createElement("DIV");
         a.setAttribute("id", this.id + "autocomplete-list");
-        a.setAttribute("class", "autocomplete-items");
+        a.setAttribute("class", `autocomplete-items ${isDarkMode ? "dark-mode" : ""}`);
 
         a.style.position = "absolute";
         a.style.bottom = "100%";
@@ -23,15 +23,17 @@ export function autocomplete(inp, arr, onSelect) {
 
         let matchCount = 0;
         for (let i = 0; i < arr.length && matchCount < 6; i++) {
-            let normalizedItem = arr[i].replace(/[`’‘]/g, "'"); 
-            if (normalizedItem.toUpperCase().includes(val.toUpperCase())) { 
+            let normalizedItem = arr[i].replace(/[`’‘]/g, "'");
+            if (normalizedItem.toUpperCase().includes(val.toUpperCase())) {
                 b = document.createElement("DIV");
 
                 const regex = new RegExp(`(${val})`, "i");
-                b.innerHTML = normalizedItem.replace(regex, "<strong>$1</strong>"); 
+                b.innerHTML = normalizedItem.replace(regex, "<strong>$1</strong>");
                 b.innerHTML += `<input type='hidden' value="${arr[i].replace(/"/g, '&quot;')}">`;
 
-                b.addEventListener("click", function (e) {
+                b.className = isDarkMode ? "autocomplete-item dark" : "autocomplete-item";
+
+                b.addEventListener("click", function () {
                     const selectedSong = this.getElementsByTagName("input")[0].value;
 
                     inp.value = selectedSong;

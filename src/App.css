@@ -66,3 +66,50 @@ html.dark {
 	background-color: DodgerBlue !important;
 	color: #ffffff;
 }
+
+.dark .autocomplete input {
+	background-color: #374151; /* Dark background */
+	color: #d1d5db; /* Light gray text */
+	border-color: #4b5563; /* Gray border */
+  }
+  
+/* Transition for smooth changes */
+.autocomplete input {
+transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+  
+/* Disabled styles */
+.autocomplete input:disabled {
+cursor: not-allowed;
+opacity: 0.6;
+}
+
+.autocomplete-items {
+	background-color: #ffffff; /* Light mode background */
+	border: 1px solid #ccc;
+	z-index: 99;
+  }
+  
+  .autocomplete-items.dark-mode {
+	background-color: #374151; /* Dark mode background */
+	border-color: #4b5563; /* Dark mode border */
+  }
+  
+  /* Autocomplete item */
+  .autocomplete-item {
+	padding: 10px;
+	cursor: pointer;
+  }
+  
+  .autocomplete-item:hover {
+	background-color: #f1f1f1; /* Light mode hover */
+  }
+  
+  .autocomplete-item.dark {
+	background-color: #4b5563; /* Dark mode background */
+	color: #d1d5db; /* Light gray text */
+  }
+  
+  .autocomplete-item.dark:hover {
+	background-color: #6b7280; /* Dark mode hover */
+  }

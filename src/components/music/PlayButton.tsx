@@ -4,9 +4,10 @@ import { useEffect, useState, useRef } from "react";
 type Props = {
   audioUrl: string;
   playDuration: number;
+  isDarkMode?: boolean; // Optional dark mode prop
 };
 
-export const PlayButton = ({ audioUrl, playDuration }: Props) => {
+export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTime, setRemainingTime] = useState(playDuration);
@@ -94,34 +95,45 @@ export const PlayButton = ({ audioUrl, playDuration }: Props) => {
     }
   };
 
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60)
-      .toString()
-      .padStart(2, "0");
-    const seconds = ((time % 60) - 1).toString().padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  };
-
   return (
     <div className="flex items-center justify-center space-x-4">
       <div className="flex items-center">
         {isLoading ? (
           <div className="w-14 h-14 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-400"></div>
           </div>
         ) : isPlaying ? (
           <PauseIcon
-            className="w-14 h-14 cursor-pointer dark:stroke-white"
+            className={`w-14 h-14 cursor-pointer ${
+              isDarkMode ? "text-gray-300" : "dark:stroke-white"
+            }`}
             onClick={togglePlayPause}
           />
         ) : (
           <PlayIcon
-            className="w-14 h-14 cursor-pointer dark:stroke-white"
+            className={`w-14 h-14 cursor-pointer ${
+              isDarkMode ? "text-gray-300" : "dark:stroke-white"
+            }`}
             onClick={togglePlayPause}
           />
         )}
       </div>
-      <div className="text-xl font-semibold">{formatTime(remainingTime)}</div>
-    </div>
+        <div
+          className={`text-xl font-semibold ${
+            isDarkMode ? "text-gray-300" : "dark:stroke-white"
+          }`}
+        >
+          {formatTime(remainingTime)}
+        </div>    
+      </div>
   );
 };
+
+const formatTime = (time: number) => {
+  const minutes = Math.floor(time / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = ((time % 60) - 1).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+

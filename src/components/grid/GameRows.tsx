@@ -10,9 +10,10 @@ type GameRowsProps = {
   guesses: string[];
   skippedRows: number[];
   isGameWon: boolean;
+  isDarkMode: boolean;
 };
 
-export const GameRows = ({ guesses, skippedRows, isGameWon }: GameRowsProps) => {
+export const GameRows = ({ guesses, skippedRows, isGameWon, isDarkMode }: GameRowsProps) => {
   const [guessIds, setGuessIds] = useState<(number | null)[]>([]);
 
   useEffect(() => {
@@ -49,19 +50,19 @@ export const GameRows = ({ guesses, skippedRows, isGameWon }: GameRowsProps) => 
       {combinedRows.map((row) => {
         switch (row.type) {
           case "skipped":
-            return <SkippedRow key={row.id}/>;
+            return <SkippedRow isDarkMode={isDarkMode} key={row.id}/>;
           case "guess":
             if (typeof row.id === "number") {
               return row.isCorrect ? (
-                <CorrectRow key={row.id} hymn={songTitles[row.id]} />
+                <CorrectRow key={row.id} isDarkMode={isDarkMode} hymn={songTitles[row.id]} />
               ) : (
-                <IncorrectRow key={row.id} hymn={songTitles[row.id]} />
+                <IncorrectRow key={row.id} isDarkMode={isDarkMode} hymn={songTitles[row.id]} />
               );
             }
             break;
           case "empty":
           default:
-            return <EmptyRow key={row.id} />;
+            return <EmptyRow isDarkMode={isDarkMode} key={row.id} />;
         }
       })}
     </div>

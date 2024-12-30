@@ -35,7 +35,7 @@ export const shareStatus = (
 
   const textToShare = lost
     ? `${GAME_TITLE} ${todayDate}, oh no, I lost!\n${emojiString}\nTry to beat my score at https://hymnle.com`
-    : `${GAME_TITLE} ${todayDate}, I solved it in ${guesses.length} tries${
+    : `${GAME_TITLE} ${todayDate}, I solved it in ${guesses.length} ${guesses.length > 1 ? 'tries' : 'try'}${
         isHardMode ? ' on hard mode' : ''
       }!\n${emojiString}\nTry to beat my score at https://hymnle.com`;
 

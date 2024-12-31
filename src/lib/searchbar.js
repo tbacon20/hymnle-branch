@@ -1,4 +1,4 @@
-import { SONGS } from '../constants/songs';
+import { SONGS } from '../constants/allSongs';
 
 export function autocomplete(inp, arr, onSelect, isDarkMode) {
     let currentFocus;

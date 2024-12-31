@@ -23,7 +23,7 @@
     -->
     <title>%REACT_APP_GAME_NAME%</title>
 
-    <% if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_GOOGLE_MEASUREMENT_ID != null) { %>
+    <% if (process.env.REACT_APP_GOOGLE_MEASUREMENT_ID != null) { %>
       <!-- Global site tag (gtag.js) - Google Analytics -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GOOGLE_MEASUREMENT_ID%"></script>
       <script>

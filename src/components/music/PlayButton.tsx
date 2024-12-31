@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 type Props = {
   audioUrl: string;
   playDuration: number;
-  isDarkMode?: boolean; // Optional dark mode prop
+  isDarkMode: boolean;
 };
 
 export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props) => {

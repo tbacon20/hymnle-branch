@@ -17,9 +17,7 @@ import {
 import {
   isWinningSong,
   solution,
-  solutionMp3Url,
-  getRandomSong,
-  setNewSolution,
+  solutionMp3Url
 } from "./lib/songs";
 import { addStatsForCompletedGame, loadStats } from "./lib/stats";
 import {
@@ -70,7 +68,7 @@ function App() {
     if (gameWasWon) setIsGameWon(true);
     if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
       setIsGameLost(true);
-      showErrorAlert(CORRECT_SONG_MESSAGE(solution), { delayMs: 500 });
+      showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
     }
     return loaded.guesses;
   });
@@ -104,25 +102,22 @@ function App() {
         delayMs: 500,
         onClose: () => setIsSongModalOpen(true),
       });
+
+      fetch(`https://hymnle.com/game_won?guesses=${guesses.length}`, {
+        method: 'GET',
+      });
+
+      window.gtag('event', 'game_won', {
+        event_category: 'Game',
+        event_label: 'Hymnle Win',
+        value: guesses.length,
+      });
     }
     if (isGameLost) {
       setTimeout(() => setIsSongModalOpen(true), 500);
     }
-  }, [isGameWon, isGameLost, showSuccessAlert]);
+  }, [isGameWon, isGameLost, showSuccessAlert, guesses.length]);
 
-  /* Helper Functions */
-
-  const resetGame = () => {
-    const newSongData = getRandomSong();
-    setNewSolution(newSongData);
-    setGuesses([]);
-    setSkippedRows([]);
-    setCurrentGuess("");
-    setCurrentTurn(1);
-    setIsGameWon(false);
-    setIsGameLost(false);
-    saveGameStateToLocalStorage({ guesses: [], solution: newSongData.solution });
-  };
 
   const handleDarkMode = (isDark: boolean) => {
     setIsDarkMode(isDark);
@@ -178,7 +173,7 @@ function App() {
       } else if (currentTurn === MAX_CHALLENGES) {
         setStats(addStatsForCompletedGame(stats, guesses.length + 1));
         setIsGameLost(true);
-        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { delayMs: 500 });
+        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
       }
       setCurrentTurn((prevTurn) => prevTurn + 1);
     } else {
@@ -198,7 +193,7 @@ function App() {
       if (updatedGuesses.length === MAX_CHALLENGES) {
         setStats(addStatsForCompletedGame(stats, updatedGuesses.length));
         setIsGameLost(true);
-        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { delayMs: 500 });
+        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
       }
       return updatedGuesses;
     });
@@ -221,16 +216,10 @@ function App() {
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
           <div className="flex justify-between mt-4">
-            {isGameWon || isGameLost ? (
-              <button onClick={resetGame} className="w-30 rounded-md border border-indigo-600 shadow-sm px-4 py-2 bg-white text-indigo-600 font-medium hover:bg-gray-100">
-                New Song?
-              </button>
-            ) : (
-              <>
-                <SkipButton onSkip={onSkip} timeAdded={timeAdded} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
-                <SubmitButton onClick={onEnter} isDisabled={isGameWon || isGameLost} />
-              </>
-            )}
+            <>
+              <SkipButton onSkip={onSkip} timeAdded={timeAdded} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
+              <SubmitButton onClick={onEnter} isDisabled={isGameWon || isGameLost} />
+            </>
           </div>
         </div>
         <InfoModal isOpen={isInfoModalOpen} handleClose={() => setIsInfoModalOpen(false)} />

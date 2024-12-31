@@ -5,7 +5,7 @@ import { SongModal } from "./components/modals/SongModal";
 import { SettingsModal } from "./components/modals/SettingsModal";
 
 import {
-  WIN_MESSAGES,
+  WIN_MESSAGE,
   GAME_COPIED_MESSAGE,
   CORRECT_SONG_MESSAGE,
   HARD_MODE_ALERT_MESSAGE,
@@ -37,14 +37,12 @@ import { GameRows } from "./components/grid/GameRows";
 import { songTitles } from "./lib/searchbar";
 
 function App() {
-
   // ** State Management **
 
   const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } = useAlert();
 
   const [currentGuess, setCurrentGuess] = useState("");
-  const [currentTurn, setCurrentTurn] = useState(1);
   const [isGameWon, setIsGameWon] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
@@ -68,12 +66,14 @@ function App() {
     if (gameWasWon) setIsGameWon(true);
     if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
       setIsGameLost(true);
-      showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
+      showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true, delayMs: 500 });
     }
     return loaded.guesses;
   });
   const [stats, setStats] = useState(() => loadStats());
   const [skippedRows, setSkippedRows] = useState<number[]>([]);
+
+  const currentTurn = guesses.length + 1;
 
   // ** Effect Hooks **
 
@@ -97,27 +97,25 @@ function App() {
 
   useEffect(() => {
     if (isGameWon) {
-      const winMessage = WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)];
-      showSuccessAlert(winMessage, {
-        delayMs: 500,
-        onClose: () => setIsSongModalOpen(true),
-      });
-
+      const winMessage = WIN_MESSAGE(guesses.length);
+      showSuccessAlert(winMessage, { delayMs: 500, persist: true });
+      setTimeout(() => setIsSongModalOpen(true), 2000);
       fetch(`https://hymnle.com/game_won?guesses=${guesses.length}`, {
-        method: 'GET',
+        method: "GET",
       });
-
-      window.gtag('event', 'game_won', {
-        event_category: 'Game',
-        event_label: 'Hymnle Win',
+  
+      window.gtag("event", "game_won", {
+        event_category: "Game",
+        event_label: "Hymnle Win",
         value: guesses.length,
       });
     }
     if (isGameLost) {
       setTimeout(() => setIsSongModalOpen(true), 500);
     }
-  }, [isGameWon, isGameLost, showSuccessAlert, guesses.length]);
+  }, [isGameWon, isGameLost, showSuccessAlert, guesses.length]);  
 
+  // ** Helper Functions **
 
   const handleDarkMode = (isDark: boolean) => {
     setIsDarkMode(isDark);
@@ -134,22 +132,21 @@ function App() {
   };
 
   const normalPlayDurations = new Map<number, number>([[1, 2], [2, 3], [3, 5], [4, 9], [5, 16], [6, 31], [7, 31]]);
-
   const hardModePlayDurations = new Map<number, number>([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 7]]);
 
-  const getPlayDuration = (turn: number): number => {
+  const getPlayDuration = (): number => {
     const playDurations = isHardMode ? hardModePlayDurations : normalPlayDurations;
-    return playDurations.get(turn) ?? 31; // Fallback to 31 seconds if turn not found
+    return playDurations.get(currentTurn) ?? 31; // Fallback to 31 seconds
   };
 
-  const calculateTimeAdded = (turn: number): number => {
+  const calculateTimeAdded = (): number => {
     const playDurations = isHardMode ? hardModePlayDurations : normalPlayDurations;
-    const currentDuration = playDurations.get(turn) ?? 0;
-    const nextDuration = playDurations.get(turn + 1) ?? 0;
+    const currentDuration = playDurations.get(currentTurn) ?? 0;
+    const nextDuration = playDurations.get(currentTurn + 1) ?? 0;
     return nextDuration - currentDuration;
   };
 
-  const timeAdded = calculateTimeAdded(currentTurn);
+  const timeAdded = calculateTimeAdded();
 
   const onSelect = (selectedHymn: string) => {
     setCurrentGuess(selectedHymn);
@@ -173,9 +170,8 @@ function App() {
       } else if (currentTurn === MAX_CHALLENGES) {
         setStats(addStatsForCompletedGame(stats, guesses.length + 1));
         setIsGameLost(true);
-        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
+        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true, delayMs: 500 });
       }
-      setCurrentTurn((prevTurn) => prevTurn + 1);
     } else {
       showErrorAlert(hymn ? "No more guesses left" : "Hymn title not found");
     }
@@ -193,11 +189,10 @@ function App() {
       if (updatedGuesses.length === MAX_CHALLENGES) {
         setStats(addStatsForCompletedGame(stats, updatedGuesses.length));
         setIsGameLost(true);
-        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true , delayMs: 500 });
+        showErrorAlert(CORRECT_SONG_MESSAGE(solution), { persist: true, delayMs: 500 });
       }
       return updatedGuesses;
     });
-    setCurrentTurn((prev) => prev + 1);
   };
 
   // ** Render **
@@ -212,7 +207,7 @@ function App() {
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
         <GameRows guesses={guesses} skippedRows={skippedRows} isGameWon={isGameWon} isDarkMode={isDarkMode} />
-        <PlayButton audioUrl={solutionMp3Url} isDarkMode={isDarkMode} playDuration={getPlayDuration(currentTurn)} />
+        <PlayButton audioUrl={solutionMp3Url} isDarkMode={isDarkMode} playDuration={getPlayDuration()} />
         <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
           <div className="flex justify-between mt-4">

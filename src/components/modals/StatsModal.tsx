@@ -8,8 +8,7 @@ import { BaseModal } from './BaseModal'
 import {
   STATISTICS_TITLE,
   GUESS_DISTRIBUTION_TEXT,
-  NEW_SONG_TEXT,
-  SHARE_TEXT,
+  NEW_SONG_TEXT
 } from '../../constants/strings'
 
 type Props = {
@@ -84,7 +83,7 @@ export const StatsModal = ({
               )
             }}
           >
-            {SHARE_TEXT}
+            Share Score
           </button>
         </div>
       )}

@@ -1,7 +1,7 @@
 
 export const GAME_TITLE = process.env.REACT_APP_GAME_NAME!
 
-export const WIN_MESSAGES = ['Celestial!', 'Heavenly!', 'Hurrah for Israel!', 'Blessed!', 'You are awesome!', 'Jesus Loves You!']
+export const WIN_MESSAGE = (numTries: number) => `You solved it in ${numTries} ${numTries > 1 ? 'tries' : 'try'}!`
 export const GAME_COPIED_MESSAGE = 'Game copied to clipboard'
 export const HARD_MODE_ALERT_MESSAGE =
   'Hard Mode can only be enabled at the start!'
@@ -12,7 +12,6 @@ export const CORRECT_SONG_MESSAGE = (solution: string) =>
 export const STATISTICS_TITLE = 'Statistics'
 export const GUESS_DISTRIBUTION_TEXT = 'Guess Distribution'
 export const NEW_SONG_TEXT = 'New song in'
-export const SHARE_TEXT = 'Share'
 export const TOTAL_TRIES_TEXT = 'Total tries'
 export const SUCCESS_RATE_TEXT = 'Success rate'
 export const CURRENT_STREAK_TEXT = 'Current streak'

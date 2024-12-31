@@ -120,7 +120,7 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
       </div>
         <div
           className={`text-xl font-semibold ${
-            isDarkMode ? "text-gray-300" : "dark:stroke-white"
+            isDarkMode ? "text-gray-300" : "text-[#185642]"
           }`}
         >
           {formatTime(remainingTime)}

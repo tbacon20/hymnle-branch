@@ -1,7 +1,6 @@
 import { BaseModal } from "./BaseModal";
 import { shareStatus } from "../../lib/share";
-import { SHARE_TEXT } from "../../constants/strings";
-import { songUrl } from "../../lib/songs";
+import { songUrl, solution } from "../../lib/songs";
 
 type Props = {
   isOpen: boolean;
@@ -23,24 +22,32 @@ export const SongModal = ({
   isHardMode,
   isDarkMode,
 }: Props) => {
-  const removeNumberPrefix = (title: string) => title.replace(/^\d+[a-zA-Z]?\.\s*/, "");
-
   return (
-    <BaseModal title="Your Guesses" isOpen={isOpen} handleClose={handleClose}>
-      {generateResultEmojis(guesses, isGameLost, removeNumberPrefix, isDarkMode)}
-      <div className={`mt-5 sm:mt-6 ${isDarkMode ? "text-gray-300" : "text-black"}`}>
-        Listen to the full song{" "}
+    <BaseModal title="" isOpen={isOpen} handleClose={handleClose}>
+      <div className={`text-lg font-medium mt-4 ${isDarkMode ? "text-gray-300" : "text-black"}`}>
+        Solution:{" "}
         <a
           href={songUrl}
           target="_blank"
-          className={`underline font-bold ${
-            isDarkMode ? "text-blue-400" : "text-blue-700"
-          }`}
+          className="underline font-bold text-[#185642]"
           rel="noreferrer"
           tabIndex={-1}
         >
-          here
+          {solution}
         </a>
+      </div>
+      <div className={`text-base mt-6 ${isDarkMode ? "text-gray-300" : "text-black"}`}>
+        Enjoying Hymnle? Then don't forget to play{" "}
+        <a
+          href="https://comefollowmedle.com"
+          target="_blank"
+          className="underline font-bold text-[#185642]"
+          rel="noreferrer"
+          tabIndex={-1}
+        >
+          Come Follow Medle
+        </a>{" "}
+        today!
       </div>
       <div className={`mt-5 sm:mt-6 columns-2 ${isDarkMode ? "text-gray-300" : "text-black"}`}>
         <div>
@@ -48,7 +55,7 @@ export const SongModal = ({
             type="button"
             className={`mt-2 w-full rounded-md border ${
               isDarkMode ? "border-gray-600 bg-gray-800 text-white" : "border-[#185642] bg-white text-[#185642]"
-            } shadow-sm px-4 py-2 text-base font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm`}
+            } shadow-sm px-4 py-2 text-base font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#185642] sm:text-sm`}
             onClick={() => {
               handleClose();
             }}
@@ -62,43 +69,16 @@ export const SongModal = ({
             type="button"
             className={`mt-2 w-full rounded-md border border-transparent shadow-sm px-4 py-2 ${
               isDarkMode ? "bg-[#185642] text-white hover:bg-[#185642]" : "bg-[#185642] text-white hover:bg-[#185642]"
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm`}
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#185642] sm:text-sm`}
             onClick={() => {
               shareStatus(guesses, isGameLost, isHardMode, handleShareToClipboard);
             }}
             tabIndex={-1}
           >
-            {SHARE_TEXT}
+            Share Score
           </button>
         </div>
       </div>
     </BaseModal>
-  );
-};
-
-export const generateResultEmojis = (
-  guesses: string[],
-  isGameLost: boolean,
-  removeNumberPrefix: (title: string) => string,
-  isDarkMode: boolean
-) => {
-  return (
-    <div className="flex flex-col items-center mt-4 space-y-2">
-      {guesses.map((guess, index) => {
-        const guessText = guess === "SKIPPED" ? "Skipped" : removeNumberPrefix(guess);
-        const textColor = isDarkMode ? "text-gray-300" : "text-black";
-        return (
-          <div
-            key={index}
-            className="flex items-center space-x-1 w-full max-w-xs justify-start"
-          >
-            <span className="w-6 text-lg text-center">
-              {guess === "SKIPPED" ? "⏭️" : !isGameLost && index === guesses.length - 1 ? "✅" : "❌"}
-            </span>
-            <span className={`text-medium font-medium ${textColor}`}>{guessText}</span>
-          </div>
-        );
-      })}
-    </div>
   );
 };

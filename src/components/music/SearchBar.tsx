@@ -24,7 +24,7 @@ export const SearchBar = ({ onSelect, isDisabled, isDarkMode }: SearchBarProps) 
         type="text"
         id="searchBarInput"
         placeholder="Search for a song..."
-        className={`w-full p-2 rounded-md border ${
+        className={`w-full p-2 rounded-md border focus:outline-[#185642] ${
           isDisabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed"
             : isDarkMode

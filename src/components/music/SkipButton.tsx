@@ -14,7 +14,7 @@ export const SkipButton = ({ onSkip, isDisabled, isDarkMode, timeAdded }: SkipBu
           ? "opacity-50 cursor-not-allowed bg-gray-100 text-gray-500"
           : isDarkMode
           ? "bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700"
-          : "bg-white text-indigo-600 border-indigo-600 hover:bg-gray-200"
+          : "bg-white text-[#185642] border-[#185642] hover:bg-gray-200"
       }`}
       onClick={onSkip}
       disabled={isDisabled}

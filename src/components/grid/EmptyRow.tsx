@@ -9,7 +9,7 @@ export const EmptyRow = React.memo(({ isDarkMode }: EmptyRowProps) => {
     <div className="flex pb-2">
       <div
         className={`w-full h-14 border-solid border-2 flex items-center justify-center mx-0.5 font-bold rounded ${
-          isDarkMode ? "bg-gray-800 border-gray-600 text-gray-400" : "bg-white border-slate-400 text-black"
+          isDarkMode ? "bg-gray-800 border-gray-600 text-gray-400" : "bg-white border-[#185642] text-black"
         }`}
       ></div>
     </div>

@@ -105,14 +105,14 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
         ) : isPlaying ? (
           <PauseIcon
             className={`w-14 h-14 cursor-pointer ${
-              isDarkMode ? "text-gray-300" : "dark:stroke-white"
+              isDarkMode ? "text-gray-300" : "text-[#185642]"
             }`}
             onClick={togglePlayPause}
           />
         ) : (
           <PlayIcon
             className={`w-14 h-14 cursor-pointer ${
-              isDarkMode ? "text-gray-300" : "dark:stroke-white"
+              isDarkMode ? "text-gray-300" : "text-[#185642]"
             }`}
             onClick={togglePlayPause}
           />

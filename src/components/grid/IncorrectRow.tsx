@@ -13,7 +13,7 @@ export const IncorrectRow = React.memo(({ hymn, isDarkMode }: IncorrectRowProps)
         className={`w-full h-14 border-solid border-2 flex items-center mx-0.5 font-bold rounded ${
           isDarkMode
             ? "bg-gray-800 text-gray-300 border-red-700"
-            : "bg-[#f35151] text-white border-[#f35151]"
+            : "bg-[#fc4040ab] text-white border-[#f35151]"
         }`}
       >
         <XCircleIcon

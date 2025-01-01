@@ -29,7 +29,7 @@ export const SongModal = ({
         <a
           href={songUrl}
           target="_blank"
-          className="underline font-bold text-[#3d8464]"
+          className="underline font-bold text-[#25c77ef5]"
           rel="noreferrer"
           tabIndex={-1}
         >
@@ -41,7 +41,7 @@ export const SongModal = ({
         <a
           href="https://comefollowmedle.com"
           target="_blank"
-          className="underline font-bold text-[#3d8464]"
+          className="underline font-bold text-[#25c77ef5]"
           rel="noreferrer"
           tabIndex={-1}
         >
@@ -55,7 +55,7 @@ export const SongModal = ({
             type="button"
             className={`mt-2 w-full rounded-md border ${
               isDarkMode ? "border-gray-600 bg-gray-800 text-white" : "border-[#185642] bg-white text-[#185642]"
-            } shadow-sm px-4 py-2 text-base font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#185642] sm:text-sm`}
+            } shadow-sm px-4 py-2 text-base font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#185642] sm:text-sm`}
             onClick={() => {
               handleClose();
             }}

@@ -31,7 +31,6 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
 
-    // Start preloading
     audio.load();
 
     return () => {
@@ -113,7 +112,7 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
         ) : (
           <PlayIcon
             className={`w-14 h-14 cursor-pointer ${
-              isDarkMode ? "text-gray-500" : "text-[#185642]"
+              isDarkMode ? "text-gray-300" : "text-[#185642]"
             }`}
             onClick={togglePlayPause}
           />

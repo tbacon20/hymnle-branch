@@ -22,7 +22,7 @@ export function autocomplete(inp, arr, onSelect, isDarkMode) {
         this.parentNode.appendChild(a);
 
         let matchCount = 0;
-        for (let i = 0; i < arr.length && matchCount < 6; i++) {
+        for (let i = 0; i < arr.length && matchCount < 4; i++) { // Show only 4 items
             let normalizedItem = arr[i].replace(/[`’‘]/g, "'");
             if (normalizedItem.toUpperCase().includes(val.toUpperCase())) {
                 b = document.createElement("DIV");
@@ -32,6 +32,9 @@ export function autocomplete(inp, arr, onSelect, isDarkMode) {
                 b.innerHTML += `<input type='hidden' value="${arr[i].replace(/"/g, '&quot;')}">`;
 
                 b.className = isDarkMode ? "autocomplete-item dark" : "autocomplete-item";
+
+                b.style.fontSize = "1.3em"; // Increase font size slightly
+                b.style.padding = "12px 16px"; // Optional: adjust padding for better spacing
 
                 b.addEventListener("click", function () {
                     const selectedSong = this.getElementsByTagName("input")[0].value;

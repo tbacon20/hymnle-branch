@@ -12,13 +12,13 @@ export const CorrectRow = React.memo(({ hymn, isDarkMode }: CorrectRowProps) => 
       <div
         className={`w-full h-14 border-solid border-2 flex items-center mx-0.5 font-bold rounded ${
           isDarkMode
-            ? "bg-gray-800 text-gray-300 border-green-700"
-            : "bg-white text-black border-green-600"
+            ? "bg-gray-800 text-gray-300 border-[#3d8464]"
+            : "bg-[#3d8464] text-white border-[#3d8464]"
         }`}
       >
         <CheckCircleIcon
           className={`w-10 h-10 mx-2 ${
-            isDarkMode ? "text-green-400" : "text-green-500"
+            isDarkMode ? "text-green-300" : "text-white"
           }`}
         />
         <div>{hymn}</div>

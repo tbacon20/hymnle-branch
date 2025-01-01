@@ -1,4 +1,5 @@
-import { PlayIcon, PauseIcon } from "@heroicons/react/outline";
+import { PauseIcon } from "@heroicons/react/outline";
+import { PlayIcon } from "@heroicons/react/solid"
 import { useEffect, useState, useRef } from "react";
 
 type Props = {
@@ -105,14 +106,14 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
         ) : isPlaying ? (
           <PauseIcon
             className={`w-14 h-14 cursor-pointer ${
-              isDarkMode ? "text-gray-300" : "text-[#185642]"
+              isDarkMode ? "text-gray-500" : "text-[#185642]"
             }`}
             onClick={togglePlayPause}
           />
         ) : (
           <PlayIcon
             className={`w-14 h-14 cursor-pointer ${
-              isDarkMode ? "text-gray-300" : "text-[#185642]"
+              isDarkMode ? "text-gray-500" : "text-[#185642]"
             }`}
             onClick={togglePlayPause}
           />

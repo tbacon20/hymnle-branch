@@ -4,7 +4,7 @@ export function autocomplete(inp, arr, onSelect, isDarkMode) {
     let currentFocus;
 
     inp.addEventListener("input", function () {
-        let a, b, val = this.value.replace(/[`’‘]/g, "'");
+        let a, b, val = this.value.replace(/[`’‘]/g, "").replace(/,/g, "");
         closeAllLists();
         if (!val) {
             return false;
@@ -23,13 +23,17 @@ export function autocomplete(inp, arr, onSelect, isDarkMode) {
 
         let matchCount = 0;
         for (let i = 0; i < arr.length && matchCount < 4; i++) { // Show only 4 items
-            let normalizedItem = arr[i].replace(/[`’‘]/g, "'");
-            if (normalizedItem.toUpperCase().includes(val.toUpperCase())) {
+            let originalItem = arr[i];
+            let normalizedItem = originalItem.replace(/[`’‘]/g, "").replace(/,/g, "").toLowerCase();
+            let normalizedVal = val.toLowerCase();
+
+            if (normalizedItem.includes(normalizedVal)) {
                 b = document.createElement("DIV");
 
-                const regex = new RegExp(`(${val})`, "i");
-                b.innerHTML = normalizedItem.replace(regex, "<strong>$1</strong>");
-                b.innerHTML += `<input type='hidden' value="${arr[i].replace(/"/g, '&quot;')}">`;
+                let startIndex = normalizedItem.indexOf(normalizedVal);
+                let endIndex = startIndex + normalizedVal.length;
+                b.innerHTML = `${originalItem.slice(0, startIndex)}<strong>${originalItem.slice(startIndex, endIndex)}</strong>${originalItem.slice(endIndex)}`;
+                b.innerHTML += `<input type='hidden' value="${originalItem.replace(/"/g, '&quot;')}">`;
 
                 b.className = isDarkMode ? "autocomplete-item dark" : "autocomplete-item";
 

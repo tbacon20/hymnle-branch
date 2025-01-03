@@ -131,8 +131,8 @@ function App() {
     }
   };
 
-  const normalPlayDurations = new Map<number, number>([[1, 2], [2, 3], [3, 5], [4, 9], [5, 16], [6, 31], [7, 31]]);
-  const hardModePlayDurations = new Map<number, number>([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 7]]);
+  const normalPlayDurations = new Map<number, number>([[1, 1], [2, 2], [3, 4], [4, 8], [5, 15], [6, 30], [7, 30]]);
+  const hardModePlayDurations = new Map<number, number>([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 6]]);
 
   const getPlayDuration = (): number => {
     const playDurations = isHardMode ? hardModePlayDurations : normalPlayDurations;

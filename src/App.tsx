@@ -72,6 +72,8 @@ function App() {
   });
   const [stats, setStats] = useState(() => loadStats());
   const [skippedRows, setSkippedRows] = useState<number[]>([]);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const extendedPlayDuration = 60;
 
   const currentTurn = guesses.length + 1;
 
@@ -109,6 +111,8 @@ function App() {
         event_label: "Hymnle Win",
         value: guesses.length,
       });
+
+      setAutoPlay(true);
     }
     if (isGameLost) {
       setTimeout(() => setIsSongModalOpen(true), 500);
@@ -207,8 +211,12 @@ function App() {
       />
       <div className="pt-2 px-1 pb-8 md:max-w-7xl w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow">
         <GameRows guesses={guesses} skippedRows={skippedRows} isGameWon={isGameWon} isDarkMode={isDarkMode} />
-        <PlayButton audioUrl={solutionMp3Url} isDarkMode={isDarkMode} playDuration={getPlayDuration()} />
-        <div className="max-w-screen-sm w-full mx-auto flex-col">
+        <PlayButton
+          audioUrl={solutionMp3Url}
+          isDarkMode={isDarkMode}
+          playDuration={isGameWon ? extendedPlayDuration : getPlayDuration()}
+          autoPlay={autoPlay}
+        />        <div className="max-w-screen-sm w-full mx-auto flex-col">
           <SearchBar onSelect={onSelect} isDarkMode={isDarkMode} isDisabled={isGameWon || isGameLost} />
           <div className="flex justify-between mt-4">
             <>

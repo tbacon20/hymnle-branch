@@ -12,8 +12,8 @@ export const CorrectRow = React.memo(({ hymn, isDarkMode }: CorrectRowProps) => 
       <div
         className={`w-full h-14 border-solid border-2 flex items-center mx-0.5 font-bold rounded ${
           isDarkMode
-            ? "bg-gray-800 text-gray-300 border-[#459370]"
-            : "bg-[#52bb8cd6] text-white border-[#459370]"
+            ? "bg-gray-800 text-gray-300 border-[#185642]"
+            : "bg-[#185642] text-white border-[#185642]"
         }`}
       >
         <CheckCircleIcon

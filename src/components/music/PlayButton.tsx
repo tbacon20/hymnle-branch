@@ -1,17 +1,18 @@
 import { PauseIcon } from "@heroicons/react/outline";
-import { PlayIcon } from "@heroicons/react/solid"
+import { PlayIcon } from "@heroicons/react/solid";
 import { useEffect, useState, useRef } from "react";
 
 type Props = {
   audioUrl: string;
   playDuration: number;
   isDarkMode: boolean;
+  autoPlay?: boolean; // Optional auto-play prop
 };
 
-export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props) => {
+export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false, autoPlay = false }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [remainingTime, setRemainingTime] = useState(playDuration);
+  const [remainingTime, setRemainingTime] = useState(playDuration); // Sync with playDuration
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,12 +45,26 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
   }, [audioUrl]);
 
   useEffect(() => {
+    // Reset timer and remaining time when playDuration changes
+    setRemainingTime(playDuration);
     if (isPlaying) {
       resetAudioAndTimer();
-    } else {
-      setRemainingTime(playDuration);
     }
   }, [playDuration]);
+
+  useEffect(() => {
+    if (autoPlay && !isPlaying) {
+      // Add 2-second delay before starting playback and reduce volume
+      const autoPlayTimeout = setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.volume = 0.5; // 50% quieter
+        }
+        resetAudioAndTimer();
+      }, 2500);
+
+      return () => clearTimeout(autoPlayTimeout); // Clean up timeout on unmount or dependency change
+    }
+  }, [autoPlay]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -73,6 +88,7 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
     audio.pause();
     audio.currentTime = 0;
     setRemainingTime(playDuration);
+    audio.volume = autoPlay ? 0.5 : 1; // Adjust volume based on autoPlay
     audio.play();
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -91,6 +107,7 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
       if (timerRef.current) clearTimeout(timerRef.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
     } else {
+      audio.volume = 1; // Reset to full volume for manual play
       resetAudioAndTimer();
     }
   };
@@ -118,14 +135,14 @@ export const PlayButton = ({ audioUrl, playDuration, isDarkMode = false }: Props
           />
         )}
       </div>
-        <div
-          className={`text-xl font-semibold ${
-            isDarkMode ? "text-gray-300" : "text-[#185642]"
-          }`}
-        >
-          {formatTime(remainingTime)}
-        </div>    
+      <div
+        className={`text-xl font-semibold ${
+          isDarkMode ? "text-gray-300" : "text-[#185642]"
+        }`}
+      >
+        {formatTime(remainingTime)}
       </div>
+    </div>
   );
 };
 
@@ -133,7 +150,6 @@ const formatTime = (time: number) => {
   const minutes = Math.floor(time / 60)
     .toString()
     .padStart(2, "0");
-  const seconds = ((time % 60)).toString().padStart(2, "0");
+  const seconds = (time % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
 };
-
